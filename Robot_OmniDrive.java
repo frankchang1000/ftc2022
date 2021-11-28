@@ -65,7 +65,8 @@ public class Robot_OmniDrive
 
     private double raise = 0;
     private double lower = 0;
-    private double duck = 0;
+    private double red = 0;
+    private double blue = 0;
 
     /* Constructor */
     public Robot_OmniDrive(){
@@ -132,7 +133,8 @@ public class Robot_OmniDrive
         setYaw(-myOpMode.gamepad1.right_stick_x);
         setRaise(myOpMode.gamepad2.right_trigger);
         setLower(myOpMode.gamepad2.left_trigger);
-        setDuck(myOpMode.gamepad1.right_trigger);
+        setRed(myOpMode.gamepad1.right_trigger);
+        setBlue(myOpMode.gamepad1.left_trigger);
     }
 
 
@@ -177,15 +179,15 @@ public class Robot_OmniDrive
 
         double powerRaise;
         double powerLower;
-        double powerDuck;
-
+        double powerRed;
+        double powerBlue;
         powerRaise = raise;
         powerLower = -lower;
-        powerDuck = duck;
+        powerRed = red;
+        powerBlue= -blue;
 
-        duckWheel.setPower(powerDuck);
-        returnMotor.setPower(powerRaise);
-        returnMotor.setPower(powerLower);
+        duckWheel.setPower(powerRed);
+        duckWheel.setPower(powerBlue);
 
         // normalize all motor speeds so no values exceeds 100%.
         //double max = Math.max(Math.abs(back), Math.abs(right));
@@ -222,12 +224,26 @@ public class Robot_OmniDrive
 
         //myOpMode.telemetry.addData("Wheels", "L[%+5.2f], R[%+5.2f], B[%+5.2f]", left, right, back);
 
-        if (myOpMode.gamepad2.b) {
+        if (myOpMode.gamepad2.right_bumper) {
             clawLeft.setPosition(0);
             clawRight.setPosition(1);
-        } else if (myOpMode.gamepad2.x) {
+        } else if (myOpMode.gamepad2.left_bumper) {
             clawLeft.setPosition(0.5);
             clawRight.setPosition(0.5);
+        }
+
+
+        if (myOpMode.gamepad2.y) {
+            slideHigh();
+        }
+        if (myOpMode.gamepad2.b) {
+            slideMid();
+        }
+        if (myOpMode.gamepad2.a) {
+            slideLow();
+        }
+        if (myOpMode.gamepad2.x) {
+            slideDrop();
         }
     }
 
@@ -237,7 +253,8 @@ public class Robot_OmniDrive
     public void setYaw(double yaw)          {driveYaw = Range.clip(yaw, -1, 1); }
     public void setRaise(double raise1)          {raise = Range.clip(raise1, -1, 1); }
     public void setLower(double lower1)          {lower = Range.clip(lower1, -1, 1); }
-    public void setDuck(double duck1)    {duck = Range.clip(duck1, -1, 1); }
+    public void setRed(double red1)    {red = Range.clip(red1, -1, 1); }
+    public void setBlue(double blue1)    {blue = Range.clip(blue1, -1, 1); }
     public void setGyro(double motor_output) {
         leftWheelF.setPower(1 * motor_output);
         leftWheelR.setPower(1 * motor_output);
@@ -257,6 +274,34 @@ public class Robot_OmniDrive
         leftWheelR.setMode(mode);
         rightWheelF.setMode(mode);
         rightWheelR.setMode(mode);
+    }
+
+    private void slideHigh() {
+        //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
+        //strafe = gamepad1.left_stick_x;
+        //rotate = gamepad1.right_stick_x;
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+800);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
+
+    private void slideMid() {
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+400);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
+
+    private void slideLow() {
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+200);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
+
+    private void slideDrop() {
+        returnMotor.setPower(0);
     }
 }
 

@@ -208,7 +208,35 @@ public class RedSideAuto extends LinearOpMode {
         //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+800);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
+    }
+    private void slideMiddle() {
+        //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
+        //strafe = gamepad1.left_stick_x;
+        //rotate = gamepad1.right_stick_x;
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+1000);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
+    private void slideLow() {
+        //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
+        //strafe = gamepad1.left_stick_x;
+        //rotate = gamepad1.right_stick_x;
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+1000);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
+    private void slideDrop() {
+        //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
+        //strafe = gamepad1.left_stick_x;
+        //rotate = gamepad1.right_stick_x;
+
+        returnMotor.setPower(0);
     }
 
     /*private void autoShoot() {
@@ -235,8 +263,8 @@ public class RedSideAuto extends LinearOpMode {
     } */
 
     private void duckSpin() {
-        duckWheel.setPower(0.5);
-        sleep(1000);
+        duckWheel.setPower(0.75);
+        sleep(2000);
         duckWheel.setPower(0);
         sleep(200);
     }
@@ -330,28 +358,35 @@ public class RedSideAuto extends LinearOpMode {
     private void caseA() {
         clawClose();
         sleep(300);
-        move(0,0.3,0);
-        sleep(500);
+        move(0,0.5,0);
+        sleep(850);
         move(0,0,0);
         sleep(100);
         slideHigh();
         sleep(500);
-        move(0.3,0,0);
-        sleep(300);
+        move(-0.45,0,0);
+        sleep(950);
         move(0,0,0);
+        sleep(1000);
         clawOpen();
-        sleep(300);
-        move(-0.3,0,0);
-        sleep(200);
-        move(0,0,0.3);
+        sleep(1000);
+        move(0.3,0,0);
+        sleep(1000);
+        move(0,0,0);
+        slideDrop();
+        move(0,0,-0.45);
+        sleep(950);
+        move(0,0,0);
         sleep(500);
-        move(-0.5,0,0);
-        sleep(500);
+        move(0.5,0,0);
+        sleep(2100);
         move(0,-0.5,0);
-        sleep(100);
+        sleep(750);
+        move(0,0,0);
+        sleep(1000);
         duckSpin();
-        move(0,-0.5,0);
-        sleep(500);
+        move(0,0.5,0);
+        sleep(750);
         move(0,0,0);
     }
 
