@@ -43,6 +43,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+import java.util.Locale;
+
 import java.util.List;
 
 /**
@@ -72,6 +87,13 @@ public class RedSideAuto extends LinearOpMode {
     private Servo clawRight = null;
     private DcMotor duckWheel = null;
     private DcMotor returnMotor = null;
+
+
+    //private Robot_OmniDrive robot = new Robot_OmniDrive();
+    private ElapsedTime runtime = new ElapsedTime();
+    private BNO055IMU imu;
+    private static double TURN_P = 0.05;
+
 
 
     /*
@@ -110,6 +132,9 @@ public class RedSideAuto extends LinearOpMode {
         // first.
         initVuforia();
         initTfod();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imuInit();
 
 
         leftWheelF = hardwareMap.dcMotor.get("D1");
@@ -184,7 +209,7 @@ public class RedSideAuto extends LinearOpMode {
 
     private void move(double drive,
                       double strafe,
-                      double rotate) {
+                      double rotate, double power) {
 
         double powerLeftF;
         double powerRightF;
@@ -197,11 +222,61 @@ public class RedSideAuto extends LinearOpMode {
         powerRightF = drive - strafe - rotate;
         powerRightR = drive + strafe - rotate;
 
-        leftWheelF.setPower(-powerLeftF);
-        leftWheelR.setPower(-powerLeftR);
+        telemetry.addData("LeftWheelF 0=%d", leftWheelF.getCurrentPosition());
 
-        rightWheelF.setPower(powerRightF);
-        rightWheelR.setPower(powerRightR);
+
+        leftWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        leftWheelF.setTargetPosition(leftWheelF.getCurrentPosition() + (int)(-powerLeftF));
+        leftWheelR.setTargetPosition(leftWheelR.getCurrentPosition() + (int)(-powerLeftR));
+
+        rightWheelF.setTargetPosition(rightWheelF.getCurrentPosition() + (int)(powerRightF));
+        rightWheelR.setTargetPosition(rightWheelR.getCurrentPosition() + (int)(powerRightR));
+/*
+        if (leftWheelF.getCurrentPosition() + (int)(-powerLeftF) < leftWheelF.getCurrentPosition()) {
+            leftWheelF.setDirection(DcMotor.Direction.REVERSE);
+        }
+        if (leftWheelR.getCurrentPosition() + (int)(-powerLeftR) < leftWheelR.getCurrentPosition()) {
+            leftWheelR.setDirection(DcMotor.Direction.REVERSE);
+        }
+        if (rightWheelF.getCurrentPosition() + (int)(powerRightF) < rightWheelF.getCurrentPosition()) {
+            rightWheelF.setDirection(DcMotor.Direction.REVERSE);
+        }
+        if (rightWheelR.getCurrentPosition() + (int)(powerLeftR) < rightWheelR.getCurrentPosition()) {
+            rightWheelR.setDirection(DcMotor.Direction.REVERSE);
+
+        }
+        */
+        leftWheelF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftWheelR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightWheelF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightWheelR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftWheelF.setPower(power);
+        leftWheelR.setPower(power);
+        rightWheelF.setPower(power);
+        rightWheelR.setPower(power);
+
+        telemetry.addData("LeftWheelF 1=%d", leftWheelF.getCurrentPosition());
+        telemetry.update();
+
+
+
+        sleep(500);
+
+        leftWheelF.setPower(0);
+        leftWheelR.setPower(0);
+        rightWheelF.setPower(0);
+        rightWheelR.setPower(0);
     }
 
     private void slideHigh() {
@@ -209,7 +284,7 @@ public class RedSideAuto extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+800);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+1000);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -218,7 +293,7 @@ public class RedSideAuto extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+1000);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+400);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -227,7 +302,7 @@ public class RedSideAuto extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+1000);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition()+200);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -356,38 +431,44 @@ public class RedSideAuto extends LinearOpMode {
     } */
 
     private void caseA() {
+        gyroTurn(90);
+        sleep(1000);
+        gyroTurn(-90);
+        sleep(1000);
+
+        gyroTurn(0);
+        sleep(1000);
+
+
+        /*
         clawClose();
         sleep(300);
-        move(0,0.5,0);
-        sleep(850);
-        move(0,0,0);
-        sleep(100);
+        move(0,150,0,0.5);
+        sleep(300);
         slideHigh();
         sleep(500);
-        move(-0.45,0,0);
-        sleep(950);
-        move(0,0,0);
-        sleep(1000);
+        move(-50,0,0,0.5);
+        sleep(500);
+        gyroTurn(10);
+        sleep(2000);
+        move(0,0,0,0.5);
+        sleep(500);
         clawOpen();
         sleep(1000);
-        move(0.3,0,0);
-        sleep(1000);
-        move(0,0,0);
-        slideDrop();
-        move(0,0,-0.45);
-        sleep(950);
-        move(0,0,0);
+        move(15,0,0,0.5);
         sleep(500);
-        move(0.5,0,0);
-        sleep(2100);
-        move(0,-0.5,0);
-        sleep(750);
-        move(0,0,0);
-        sleep(1000);
+        move(0,0,0,0.5);
+        slideDrop();
+        gyroTurn(90);
+        sleep(2000);
+        move(750,0,0,0.5);
+        sleep(500);
+        //gyroTurn(90);
+        sleep(500);
+        move(0,-250,0,0.25);
         duckSpin();
-        move(0,0.5,0);
-        sleep(750);
-        move(0,0,0);
+        sleep(500);
+        move(0,250,0,0.25);*/
     }
 
     /*private void caseC() {
@@ -491,4 +572,75 @@ public class RedSideAuto extends LinearOpMode {
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
+
+
+    private float getHeading() {
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        //return 0;
+    }
+
+
+    /* Initializes Rev Robotics IMU */
+    private void imuInit() {
+        // Set up the parameters with which we will use our IMU.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled = false;
+        parameters.loggingTag = "imu";
+        imu.initialize(parameters);
+    }
+
+
+    private void gyroTurn(double deg) {
+        double target_angle = 0 + deg;
+        leftWheelF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telemetry.addData("heading : ",getHeading());
+        telemetry.addData("target_angle : ",target_angle);
+
+        double currentHeading = getHeading();
+        telemetry.addData("currentHeading : ", currentHeading);
+        double delta = Math.abs((currentHeading - target_angle));
+        telemetry.addData("delta : ", delta);
+
+        while ( opModeIsActive() && delta >=  0.2) {
+
+            double error_degrees = (target_angle - currentHeading) % 360; //Compute Error
+            //telemetry.addData("target_angle : ",target_angle);
+            //telemetry.addData("heading : ",getHeading());
+            double motor_output = Range.clip(error_degrees * TURN_P, -.6 ,.6);
+            //double test = (0 - getHeading()) % 360;//Get Correction
+            //telemetry.addData("test : ",test);
+            // Send corresponding powers to the motors\
+            leftWheelF.setPower(-1 * motor_output);
+            leftWheelR.setPower(-1 * motor_output);
+            rightWheelF.setPower(-1*motor_output);
+            rightWheelR.setPower(-1*motor_output);
+            //Orientation angles = imu.getAngularOrientation (AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            //telemetry.addData("Spin Target : ",target_angle);
+            //telemetry.addData("Spin Degree : ",String.format(Locale.getDefault(), "%.1f", angles.firstAngle*-1));
+            //telemetry.update();
+            currentHeading = getHeading();
+            telemetry.addData("currentHeading : ", currentHeading);
+            delta = Math.abs((currentHeading - target_angle));
+            telemetry.addData("delta : ", delta);
+            telemetry.update();
+        }
+        sleep(500);
+
+        leftWheelF.setPower(0);
+        leftWheelR.setPower(0);
+        rightWheelF.setPower(0);
+        rightWheelR.setPower(0);
+        telemetry.addLine("AAAAAAA");
+        telemetry.update();
+
+    }
 }
+
+
+

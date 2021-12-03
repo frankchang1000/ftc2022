@@ -30,9 +30,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import java.util.List;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -42,14 +45,14 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 /**
  * This 2020-2021 OpMode illustrates the basics of using the TensorFlow Object Detection API to
  * determine the position of the Freight Frenzy game elements.
- *
+ * <p>
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
- *
+ * <p>
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
+@Autonomous(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
 //@Disabled
 public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
     /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
@@ -128,42 +131,68 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                        telemetry.addData("# Object Detected", updatedRecognitions.size());
-                        // step through the list of recognitions and display boundary info.
-                        int i = 0;
-                        for (Recognition recognition : updatedRecognitions) {
+            int r1 = detectDuck();
+            telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
+                    r1);
+            //hardcode for testing
+            /*if (r1 == 1) {
+                caseA();
+            } else if (r1 == 2) {
+                caseB();
+            } else {
+                caseC();
+            }
+            telemetry.update();
+            sleep(10);*/
+        }
 
-                            if (recognition.getWidth() < 100 && recognition.getHeight() < 100
-                                    && (0.75 < recognition.getWidth()/recognition.getHeight() || recognition.getWidth()/recognition.getHeight() < 1.25) ) {
 
-                                telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                                telemetry.addData(String.format("  right (%d)", i), "%.03f"
-                                        , recognition.getRight()*1000);
-                                telemetry.addData(String.format("height (%d)", i), "%.00f"
-                                        , recognition.getHeight());
-                                telemetry.addData(String.format("width (%d)", i), "%.00f"
-                                        , recognition.getWidth());
+    }
+
+    private int detectDuck() {
+
+        int iTimeOut= 5;
+        int j = 0;
+
+        while (opModeIsActive() && j < iTimeOut ) {
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    // step through the list of recognitions and display boundary info.
+                    int i = 0;
+                    for (Recognition recognition : updatedRecognitions) {
+                        if (recognition.getWidth() < 100 && recognition.getHeight() < 100
+                                && (0.75 < recognition.getWidth() / recognition.getHeight() || recognition.getWidth() / recognition.getHeight() < 1.25)) {
+
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  right (%d)", i), "%.03f"
+                                    , recognition.getRight() * 1000);
+                            if (recognition.getRight() * 1000 >= 500000) {
+                                return 1;
+                                //high
+                            } else if (recognition.getRight() * 1000 >= 250000) {
+                                return 2;
+                                //mid
+                            } else {
+                                return 3;
+                                //low
                             }
-
-
-                        /*telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                recognition.getLeft()/100, recognition.getTop()/100);
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight()/100, recognition.getBottom()/100); */
-                            i++;
+                            /*telemetry.addData(String.format("height (%d)", i), "%.00f"
+                                    , recognition.getHeight());
+                            telemetry.addData(String.format("width (%d)", i), "%.00f"
+                                    , recognition.getWidth());*/
                         }
-                        telemetry.update();
                     }
                 }
             }
+            sleep(500);
+            j++;
         }
+        return 3;
     }
 
     /**
