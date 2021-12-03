@@ -92,7 +92,7 @@ public class RedSideAuto extends LinearOpMode {
     //private Robot_OmniDrive robot = new Robot_OmniDrive();
     private ElapsedTime runtime = new ElapsedTime();
     private BNO055IMU imu;
-    private static double TURN_P = 0.05;
+    private static double TURN_P = 0.06;
 
 
 
@@ -431,10 +431,23 @@ public class RedSideAuto extends LinearOpMode {
     } */
 
     private void caseA() {
+
+        move(0,50,0,0.5);
+        sleep(300);
+
         gyroTurn(90);
         sleep(1000);
+
+        move(-50,0,0,0.5);
+        sleep(300);
+
+
         gyroTurn(-90);
         sleep(1000);
+
+
+        move(0,0,50,0.5);
+        sleep(300);
 
         gyroTurn(0);
         sleep(1000);
@@ -593,8 +606,8 @@ public class RedSideAuto extends LinearOpMode {
     }
 
 
-    private void gyroTurn(double deg) {
-        double target_angle = 0 + deg;
+    private void gyroTurn(double target_angle) {
+        //double target_angle = 0 + deg;
         leftWheelF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftWheelR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightWheelF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -607,7 +620,7 @@ public class RedSideAuto extends LinearOpMode {
         double delta = Math.abs((currentHeading - target_angle));
         telemetry.addData("delta : ", delta);
 
-        while ( opModeIsActive() && delta >=  0.2) {
+        while ( opModeIsActive() && delta >=  0.3) {
 
             double error_degrees = (target_angle - currentHeading) % 360; //Compute Error
             //telemetry.addData("target_angle : ",target_angle);
