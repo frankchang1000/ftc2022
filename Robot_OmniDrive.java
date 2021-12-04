@@ -1,32 +1,28 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import java.lang.Math;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 /**
  * This is NOT an opmode.
- *
+ * <p>
  * This class defines all the specific hardware for a three wheel omni-bot.
- *
+ * <p>
  * This hardware class assumes the following device names have been configured on the robot:
  * Note:  All names are lower case and some have single spaces between words.
- *
+ * <p>
  * Motor channel:  Left  drive motor:        "left drive"
  * Motor channel:  Right drive motor:        "right drive"
  * Motor channel:  Rear  drive motor:        "back drive"
- *
+ * <p>
  * These motors correspond to three drive locations spaced 120 degrees around a circular robot.
  * Each motor is attached to an omni-wheel. Two wheels are in front, and one is at the rear of the robot.
- *
+ * <p>
  * Robot motion is defined in three different axis motions:
  * - Axial    Forward/Backwards      +ve = Forward
  * - Lateral  Side to Side strafing  +ve = Right
@@ -34,35 +30,28 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
  */
 
 
-public class Robot_OmniDrive
-{
-    // Private Members
-    private LinearOpMode myOpMode;
+public class Robot_OmniDrive {
+    int random = 0;
 
     //private DcMotor  leftDrive      = null;
     //private DcMotor  rightDrive     = null;
     //private DcMotor  backDrive      = null;
-
+    WebcamName webcamName = null;
+    int cameraMonitorViewId = 0;
+    ColorSensor color;
+    // Private Members
+    private LinearOpMode myOpMode;
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
     private DcMotor rightWheelF = null;              //Right Wheel Front
     private DcMotor rightWheelR = null;
-
     private Servo clawLeft = null;
     private Servo clawRight = null;
     private DcMotor duckWheel = null;
     private DcMotor returnMotor = null;
-
-    int random = 0;
-
-    WebcamName webcamName = null;
-    int cameraMonitorViewId = 0;
-
-    ColorSensor color;
-
-    private double  driveAxial      = 0 ;   // Positive is forward
-    private double  driveLateral    = 0 ;   // Positive is right
-    private double  driveYaw        = 0 ;   // Positive is CCW
+    private double driveAxial = 0;   // Positive is forward
+    private double driveLateral = 0;   // Positive is right
+    private double driveYaw = 0;   // Positive is CCW
 
     private double raise = 0;
     private double lower = 0;
@@ -71,7 +60,7 @@ public class Robot_OmniDrive
 
 
     /* Constructor */
-    public Robot_OmniDrive(){
+    public Robot_OmniDrive() {
 
     }
 
@@ -109,7 +98,7 @@ public class Robot_OmniDrive
         rightWheelF.setDirection(DcMotor.Direction.REVERSE);
         rightWheelR.setDirection(DcMotor.Direction.REVERSE);
 
-        random = (int)(Math.random()*10) + 1;
+        random = (int) (Math.random() * 10) + 1;
 
 
         webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
@@ -123,10 +112,10 @@ public class Robot_OmniDrive
         //use RUN_USING_ENCODERS because encoders are installed.
         //setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // Stop all robot motion by setting each axis value to zero
-        moveRobot(0,0,0);
+        moveRobot(0, 0, 0);
     }
 
-    public void manualDrive()  {
+    public void manualDrive() {
         // In this mode the Left stick moves the robot fwd & back, and Right & Left.
         // The Right stick rotates CCW and CW.
 
@@ -187,7 +176,7 @@ public class Robot_OmniDrive
         powerRaise = raise;
         powerLower = -lower;
         powerRed = red;
-        powerBlue= -blue;
+        powerBlue = -blue;
 
         duckWheel.setPower(powerRed);
         duckWheel.setPower(powerBlue);
@@ -254,13 +243,34 @@ public class Robot_OmniDrive
     }
 
 
-    public void setAxial(double axial)      {driveAxial = Range.clip(axial, -1, 1);}
-    public void setLateral(double lateral)  {driveLateral = Range.clip(lateral, -1, 1); }
-    public void setYaw(double yaw)          {driveYaw = Range.clip(yaw, -1, 1); }
-    public void setRaise(double raise1)          {raise = Range.clip(raise1, -1, 1); }
-    public void setLower(double lower1)          {lower = Range.clip(lower1, -1, 1); }
-    public void setRed(double red1)    {red = Range.clip(red1, -1, 1); }
-    public void setBlue(double blue1)    {blue = Range.clip(blue1, -1, 1); }
+    public void setAxial(double axial) {
+        driveAxial = Range.clip(axial, -1, 1);
+    }
+
+    public void setLateral(double lateral) {
+        driveLateral = Range.clip(lateral, -1, 1);
+    }
+
+    public void setYaw(double yaw) {
+        driveYaw = Range.clip(yaw, -1, 1);
+    }
+
+    public void setRaise(double raise1) {
+        raise = Range.clip(raise1, -1, 1);
+    }
+
+    public void setLower(double lower1) {
+        lower = Range.clip(lower1, -1, 1);
+    }
+
+    public void setRed(double red1) {
+        red = Range.clip(red1, -1, 1);
+    }
+
+    public void setBlue(double blue1) {
+        blue = Range.clip(blue1, -1, 1);
+    }
+
     public void setGyro(double motor_output) {
         leftWheelF.setPower(1 * motor_output);
         leftWheelR.setPower(1 * motor_output);
@@ -269,13 +279,11 @@ public class Robot_OmniDrive
     }
 
 
-
-
     /***
      * void setMode(DcMotor.RunMode mode ) Set all drive motors to same mode.
      * @param mode    Desired Motor mode.
      */
-    public void setMode(DcMotor.RunMode mode ) {
+    public void setMode(DcMotor.RunMode mode) {
         leftWheelF.setMode(mode);
         leftWheelR.setMode(mode);
         rightWheelF.setMode(mode);
@@ -324,7 +332,7 @@ public class Robot_OmniDrive
         }
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        int target = returnMotor.getCurrentPosition()+150;
+        int target = returnMotor.getCurrentPosition() + 150;
         int max = 775;
 
         if (target >= max) {
