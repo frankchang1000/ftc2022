@@ -47,6 +47,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+
+//package org.firstinspires.ftc.teamcode;
+
+//import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
+
+
 import java.util.List;
 
 /**
@@ -115,7 +132,7 @@ public class RedSideAuto extends LinearOpMode {
         initTfod();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imuInit();
+
 
 
         leftWheelF = hardwareMap.dcMotor.get("D1");
@@ -159,15 +176,20 @@ public class RedSideAuto extends LinearOpMode {
         double a = getBatteryVoltage();
         telemetry.addData("voltage", a);
 
+
+
         telemetry.update();
 
 
         waitForStart();
 
         if (opModeIsActive()) {
-            int r1 = detectRing();
+            int r1 = detectDuck();
             telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
                     r1);
+            telemetry.update();
+            sleep(10000);
+            imuInit();
             //hardcode for testing
             /*if (r1 == 1) {
                 caseB();
@@ -222,21 +244,7 @@ public class RedSideAuto extends LinearOpMode {
 
         rightWheelF.setTargetPosition(rightWheelF.getCurrentPosition() + (int) (powerRightF));
         rightWheelR.setTargetPosition(rightWheelR.getCurrentPosition() + (int) (powerRightR));
-/*
-        if (leftWheelF.getCurrentPosition() + (int)(-powerLeftF) < leftWheelF.getCurrentPosition()) {
-            leftWheelF.setDirection(DcMotor.Direction.REVERSE);
-        }
-        if (leftWheelR.getCurrentPosition() + (int)(-powerLeftR) < leftWheelR.getCurrentPosition()) {
-            leftWheelR.setDirection(DcMotor.Direction.REVERSE);
-        }
-        if (rightWheelF.getCurrentPosition() + (int)(powerRightF) < rightWheelF.getCurrentPosition()) {
-            rightWheelF.setDirection(DcMotor.Direction.REVERSE);
-        }
-        if (rightWheelR.getCurrentPosition() + (int)(powerLeftR) < rightWheelR.getCurrentPosition()) {
-            rightWheelR.setDirection(DcMotor.Direction.REVERSE);
 
-        }
-        */
         leftWheelF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftWheelR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightWheelF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -339,10 +347,10 @@ public class RedSideAuto extends LinearOpMode {
 
     private int detectDuck() {
 
-        int iTimeOut= 5;
+        int iTimeOut = 5;
         int j = 0;
 
-        while (opModeIsActive() && j < iTimeOut ) {
+        while (opModeIsActive() && j < iTimeOut) {
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
@@ -359,10 +367,10 @@ public class RedSideAuto extends LinearOpMode {
                             telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
                             telemetry.addData(String.format("  right (%d)", i), "%.03f"
                                     , recognition.getRight() * 1000);
-                            if (recognition.getRight() * 1000 >= 500000) {
+                            if (recognition.getRight() * 1000 >= 400000) {
                                 return 1;
                                 //high
-                            } else if (recognition.getRight() * 1000 >= 250000) {
+                            } else if (recognition.getRight() * 1000 >= 200000) {
                                 return 2;
                                 //mid
                             } else {
@@ -382,7 +390,6 @@ public class RedSideAuto extends LinearOpMode {
         }
         return 3;
     }
- 
 
     /*private void caseB() {
         sleep(3500);
@@ -516,9 +523,9 @@ public class RedSideAuto extends LinearOpMode {
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -569,11 +576,12 @@ public class RedSideAuto extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.50;
+        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.inputSize = 320;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
     }
-
 
     private float getHeading() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;

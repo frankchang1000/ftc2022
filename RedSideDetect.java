@@ -55,9 +55,9 @@ import java.util.List;
  * is explained below.
  */
 
-@Autonomous(name = "ConceptTensorFlowObjectDetectionWebcam", group = "Opmode RamEaters")
+@Autonomous(name = "RedSideDetect", group = "Opmode RamEaters")
 //@Disabled
-public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
+public class RedSideDetect extends LinearOpMode {
     /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
      * the following 4 detectable objects
      *  0: Ball,
@@ -93,6 +93,23 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
 
 
+    //private static final String VUFORIA_KEY =
+            //"AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
+    private static final double TURN_P = 0.055;
+    String test = "";
+    private DcMotor leftWheelF = null;               //Left Wheel Front
+    private DcMotor leftWheelR = null;               //Left Wheel Back
+    private DcMotor rightWheelF = null;              //Right Wheel Front
+    private DcMotor rightWheelR = null;
+    private Servo clawLeft = null;
+    private Servo clawRight = null;
+    private DcMotor duckWheel = null;
+    private DcMotor returnMotor = null;
+    //private Robot_OmniDrive robot = new Robot_OmniDrive();
+    private final ElapsedTime runtime = new ElapsedTime();
+    private BNO055IMU imu;
+
+
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
@@ -109,8 +126,29 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
+
         initVuforia();
         initTfod();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        //imuInit();
+
+
+        leftWheelF = hardwareMap.dcMotor.get("D1");
+        rightWheelF = hardwareMap.dcMotor.get("D2");
+        leftWheelR = hardwareMap.dcMotor.get("D3");
+        rightWheelR = hardwareMap.dcMotor.get("D4");
+        //color = myOpMode.hardwareMap.get(ColorSensor.class, "Color");
+
+        clawLeft = hardwareMap.get(Servo.class, "CL");
+        clawRight = hardwareMap.get(Servo.class, "CR");
+        duckWheel = hardwareMap.get(DcMotor.class, "duck");
+        returnMotor = hardwareMap.get(DcMotor.class, "return");
+
+
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
 
         /**
          * Activate TensorFlow Object Detection before we wait for the start command.
@@ -133,10 +171,12 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
+
         if (opModeIsActive()) {
             int r1 = detectDuck();
             telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
                     r1);
+            imuInit();
             //hardcode for testing
             /*if (r1 == 1) {
                 caseA();
@@ -150,6 +190,9 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
             telemetry.update();
         }
 
+        if (tfod != null) {
+            tfod.shutdown();
+        }
 
     }
 
@@ -199,6 +242,119 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
         return 3;
     }
 
+    private void move(double drive,
+                      double strafe,
+                      double rotate, double power) {
+
+        double powerLeftF;
+        double powerRightF;
+        double powerLeftR;
+        double powerRightR;
+
+        powerLeftF = drive + strafe + rotate;
+        powerLeftR = drive - strafe + rotate;
+
+        powerRightF = drive - strafe - rotate;
+        powerRightR = drive + strafe - rotate;
+
+        telemetry.addData("LeftWheelF 0=%d", leftWheelF.getCurrentPosition());
+
+
+        leftWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        leftWheelF.setTargetPosition(leftWheelF.getCurrentPosition() + (int) (-powerLeftF));
+        leftWheelR.setTargetPosition(leftWheelR.getCurrentPosition() + (int) (-powerLeftR));
+
+        rightWheelF.setTargetPosition(rightWheelF.getCurrentPosition() + (int) (powerRightF));
+        rightWheelR.setTargetPosition(rightWheelR.getCurrentPosition() + (int) (powerRightR));
+
+        leftWheelF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftWheelR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightWheelF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightWheelR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftWheelF.setPower(power);
+        leftWheelR.setPower(power);
+        rightWheelF.setPower(power);
+        rightWheelR.setPower(power);
+
+        telemetry.addData("LeftWheelF 1=%d", leftWheelF.getCurrentPosition());
+        telemetry.update();
+
+
+        sleep(500);
+
+        leftWheelF.setPower(0);
+        leftWheelR.setPower(0);
+        rightWheelF.setPower(0);
+        rightWheelR.setPower(0);
+    }
+
+    private void slideHigh() {
+        //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
+        //strafe = gamepad1.left_stick_x;
+        //rotate = gamepad1.right_stick_x;
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 1000);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
+
+    private void slideMiddle() {
+        //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
+        //strafe = gamepad1.left_stick_x;
+        //rotate = gamepad1.right_stick_x;
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 400);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
+
+    private void slideLow() {
+        //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
+        //strafe = gamepad1.left_stick_x;
+        //rotate = gamepad1.right_stick_x;
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 200);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
+
+    private void slideDrop() {
+        //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
+        //strafe = gamepad1.left_stick_x;
+        //rotate = gamepad1.right_stick_x;
+
+        returnMotor.setPower(0);
+    }
+
+    private void duckSpin() {
+        duckWheel.setPower(0.75);
+        sleep(2000);
+        duckWheel.setPower(0);
+        sleep(200);
+    }
+
+    private void clawClose() {
+        clawLeft.setPosition(0.5);
+        clawRight.setPosition(0.5);
+    }
+
+    private void clawOpen() {
+        clawLeft.setPosition(0);
+        clawRight.setPosition(1);
+    }
+
+
     /**
      * Initialize the Vuforia localization engine.
      */
@@ -229,5 +385,73 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
         tfodParameters.inputSize = 320;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+    }
+
+    private float getHeading() {
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        //return 0;
+    }
+
+
+    /* Initializes Rev Robotics IMU */
+    private void imuInit() {
+        // Set up the parameters with which we will use our IMU.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled = false;
+        parameters.loggingTag = "imu";
+        imu.initialize(parameters);
+    }
+
+
+    private void gyroTurn(double target_angle) {
+        //double target_angle = 0 + deg;
+        leftWheelF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telemetry.addData("heading : ", getHeading());
+        telemetry.addData("target_angle : ", target_angle);
+
+        double currentHeading = getHeading();
+        telemetry.addData("currentHeading : ", currentHeading);
+        double delta = Math.abs((currentHeading - target_angle));
+        telemetry.addData("delta : ", delta);
+
+        while (opModeIsActive() && delta >= 0.25) {
+
+            double error_degrees = (target_angle - currentHeading) % 360; //Compute Error
+            //telemetry.addData("target_angle : ",target_angle);
+            //telemetry.addData("heading : ",getHeading());
+            double motor_output = Range.clip(error_degrees * TURN_P, -.6, .6);
+            //double test = (0 - getHeading()) % 360;//Get Correction
+            //telemetry.addData("test : ",test);
+            // Send corresponding powers to the motors\
+            leftWheelF.setPower(-1 * motor_output);
+            leftWheelR.setPower(-1 * motor_output);
+            rightWheelF.setPower(-1 * motor_output);
+            rightWheelR.setPower(-1 * motor_output);
+            //Orientation angles = imu.getAngularOrientation (AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            //telemetry.addData("Spin Target : ",target_angle);
+            //telemetry.addData("Spin Degree : ",String.format(Locale.getDefault(), "%.1f", angles.firstAngle*-1));
+            //telemetry.update();
+            currentHeading = getHeading();
+            telemetry.addData("currentHeading : ", currentHeading);
+            delta = Math.abs((currentHeading - target_angle));
+            telemetry.addData("delta : ", delta);
+            telemetry.update();
+        }
+
+        sleep(500);
+
+        leftWheelF.setPower(0);
+        leftWheelR.setPower(0);
+        rightWheelF.setPower(0);
+        rightWheelR.setPower(0);
+        //telemetry.addLine("AAAAAAA");
+        //telemetry.update();
+
     }
 }
