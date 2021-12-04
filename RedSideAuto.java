@@ -79,7 +79,7 @@ public class RedSideAuto extends LinearOpMode {
      */
     private static final String VUFORIA_KEY =
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
-    private static final double TURN_P = 0.05;
+    private static final double TURN_P = 0.055;
     String test = "";
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
@@ -160,7 +160,7 @@ public class RedSideAuto extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            int r1 = detectRing();
+            /*int r1 = detectRing();
             telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
                     r1);
             //hardcode for testing
@@ -170,7 +170,7 @@ public class RedSideAuto extends LinearOpMode {
                 caseC();
             } else {
                 caseA();
-            }
+            }*/
             caseA();
 
 
@@ -600,7 +600,7 @@ public class RedSideAuto extends LinearOpMode {
         double delta = Math.abs((currentHeading - target_angle));
         telemetry.addData("delta : ", delta);
 
-        while (opModeIsActive() && delta >= 0.2) {
+        while (opModeIsActive() && delta >= 0.25) {
 
             double error_degrees = (target_angle - currentHeading) % 360; //Compute Error
             //telemetry.addData("target_angle : ",target_angle);
@@ -623,14 +623,15 @@ public class RedSideAuto extends LinearOpMode {
             telemetry.addData("delta : ", delta);
             telemetry.update();
         }
+
         sleep(500);
 
         leftWheelF.setPower(0);
         leftWheelR.setPower(0);
         rightWheelF.setPower(0);
         rightWheelR.setPower(0);
-        telemetry.addLine("AAAAAAA");
-        telemetry.update();
+        //telemetry.addLine("AAAAAAA");
+        //telemetry.update();
 
     }
 }
