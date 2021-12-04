@@ -62,9 +62,13 @@ import java.util.List;
 @Autonomous(name = "RedSideAuto", group = "Opmode RamEaters")
 //@Disabled
 public class RedSideAuto extends LinearOpMode {
-    private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
-    private static final String LABEL_FIRST_ELEMENT = "Quad";
-    private static final String LABEL_SECOND_ELEMENT = "Single";
+    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
+    private static final String[] LABELS = {
+            //"Ball",
+            //"Cube",
+            "Duck",
+            //"Marker"
+    };
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
      * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
@@ -147,6 +151,7 @@ public class RedSideAuto extends LinearOpMode {
             //tfod.setZoom(3.5, 1.78);
             //Sets the number of pixels to obscure on the left, top, right, and bottom edges of each image passed to the TensorFlow object detector. The size of the images are not changed, but the pixels in the margins are colored black.
             //tfod.setClippingMargins(200,150,200,150);
+            tfod.setZoom(1.15, 2.5);
         }
 
         /** Wait for the game to begin */
@@ -160,18 +165,18 @@ public class RedSideAuto extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            /*int r1 = detectRing();
+            int r1 = detectRing();
             telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
                     r1);
             //hardcode for testing
-            if (r1 == 1) {
+            /*if (r1 == 1) {
                 caseB();
             } else if (r1 == 4) {
                 caseC();
             } else {
                 caseA();
             }*/
-            caseA();
+            //caseA();
 
 
         }
