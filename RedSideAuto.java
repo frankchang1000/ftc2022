@@ -354,8 +354,12 @@ public class RedSideAuto extends LinearOpMode {
         clawRight.setPosition(1);
     }
 
-    private int detectRing() {
-        while (opModeIsActive()) {
+    private int detectDuck() {
+
+        int iTimeOut= 5;
+        int j = 0;
+
+        while (opModeIsActive() && j < iTimeOut ) {
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
@@ -366,37 +370,36 @@ public class RedSideAuto extends LinearOpMode {
                     // step through the list of recognitions and display boundary info.
                     int i = 0;
                     for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        test = recognition.getLabel();
-                        telemetry.addLine(test);
-                        telemetry.addData(String.format("test (%d)", i), test);
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
-                    }
-                    telemetry.update();
+                        if (recognition.getWidth() < 100 && recognition.getHeight() < 100
+                                && (0.75 < recognition.getWidth() / recognition.getHeight() || recognition.getWidth() / recognition.getHeight() < 1.25)) {
 
-                    if (test.equals("Single")) {
-                        telemetry.addLine("single ring");
-                        telemetry.update();
-                        return 1;
-                    } else if (test.equals("Quad")) {
-                        telemetry.addLine("quad ring");
-                        telemetry.update();
-                        return 4;
-                    } else {
-                        telemetry.addLine("nothing");
-                        telemetry.update();
-                        return 0;
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  right (%d)", i), "%.03f"
+                                    , recognition.getRight() * 1000);
+                            if (recognition.getRight() * 1000 >= 500000) {
+                                return 1;
+                                //high
+                            } else if (recognition.getRight() * 1000 >= 250000) {
+                                return 2;
+                                //mid
+                            } else {
+                                return 3;
+                                //low
+                            }
+                            /*telemetry.addData(String.format("height (%d)", i), "%.00f"
+                                    , recognition.getHeight());
+                            telemetry.addData(String.format("width (%d)", i), "%.00f"
+                                    , recognition.getWidth());*/
+                        }
                     }
-
                 }
             }
+            sleep(500);
+            j++;
         }
-
-        return 0;
+        return 3;
     }
+ 
 
     /*private void caseB() {
         sleep(3500);

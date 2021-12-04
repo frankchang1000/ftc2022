@@ -248,6 +248,9 @@ public class Robot_OmniDrive
         if (myOpMode.gamepad2.x) {
             slideDrop();
         }
+        if (myOpMode.gamepad2.dpad_down) {
+            slideSubtract(20);
+        }
     }
 
 
@@ -289,12 +292,8 @@ public class Robot_OmniDrive
 
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        int target = returnMotor.getCurrentPosition()+720;
-        int max = 775;
+        int target = 720;
 
-        if (target >= max) {
-            target = max;
-        }
         returnMotor.setTargetPosition(target);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
@@ -310,12 +309,8 @@ public class Robot_OmniDrive
         }
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        int target = returnMotor.getCurrentPosition()+425;
-        int max = 775;
+        int target = 425;
 
-        if (target >= max) {
-            target = max;
-        }
         returnMotor.setTargetPosition(target);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
@@ -340,6 +335,23 @@ public class Robot_OmniDrive
         returnMotor.setPower(1);
     }
 
+    private void slideSubtract(int sub) {
+        if (random % 2 == 0) {
+            returnMotor.setDirection(DcMotor.Direction.FORWARD);
+        } else {
+            returnMotor.setDirection(DcMotor.Direction.REVERSE);
+        }
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        int target = returnMotor.getCurrentPosition() - sub;
+
+        if (target <= 0) {
+            target = 0;
+        }
+        returnMotor.setTargetPosition(target);
+        returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        returnMotor.setPower(1);
+    }
     private void slideDrop() {
         returnMotor.setPower(0);
         random = random + 1;
