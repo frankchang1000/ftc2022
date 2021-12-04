@@ -160,7 +160,7 @@ public class RedSideAuto extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            /*int r1 = detectRing();
+            int r1 = detectRing();
             telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
                     r1);
             //hardcode for testing
@@ -170,7 +170,7 @@ public class RedSideAuto extends LinearOpMode {
                 caseC();
             } else {
                 caseA();
-            }*/
+            }
             caseA();
 
 
