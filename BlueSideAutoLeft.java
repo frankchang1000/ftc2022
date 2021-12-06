@@ -76,9 +76,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "RedSideAuto", group = "Opmode RamEaters")
+@Autonomous(name = "BlueSideAutoLeft", group = "Opmode RamEaters")
 //@Disabled
-public class RedSideAuto extends LinearOpMode {
+public class BlueSideAutoLeft extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
             //"Ball",
@@ -188,9 +188,13 @@ public class RedSideAuto extends LinearOpMode {
             telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
                     r1);
             telemetry.update();
-            sleep(10000);
+            //sleep(1000);
             imuInit();
+
+
             //hardcode for testing
+            caseC();
+
             /*if (r1 == 1) {
                 caseB();
             } else if (r1 == 4) {
@@ -198,7 +202,7 @@ public class RedSideAuto extends LinearOpMode {
             } else {
                 caseA();
             }*/
-            //caseA();
+
 
 
         }
@@ -272,7 +276,7 @@ public class RedSideAuto extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 1000);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 720);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -292,7 +296,7 @@ public class RedSideAuto extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 200);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 150);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -391,41 +395,42 @@ public class RedSideAuto extends LinearOpMode {
         return 3;
     }
 
-    /*private void caseB() {
-        sleep(3500);
-        wobbleServoHand.setPosition(1);
+    private void caseB() {
+        clawClose();
+        gyroTurn(0);
+        //sleep(300);
+        move(0,-550,0,0.5);
+        sleep(1450);
+        slideLow();
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        move(-50,0,0,0.5);
+        sleep(100);
+        move(0,0,0,0.5);
+        sleep(100);
+        clawOpen();
+        sleep(100);
+        move(15,0,0,0.5);
         sleep(500);
-        raiseArm(0.5);
-        sleep(200);
-        move(0.75, 0, 0);
-        sleep(3000);
-        autoShoot();
-        move(0.75, 0, 0);
-        sleep(2500);
-        move(0, -1, 0);
-        sleep(2000);
-        move(0,0,0);
-        sleep(300);
-        lowerArm(0.5);
-        sleep(300);
-        lowerArm(0);
+        move(0,0,0,0.5);
+        slideDrop();
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
         sleep(500);
-        wobbleServoHand.setPosition(0);
-        sleep(200);
-        raiseArm(0.5);
-        sleep(300);
-        raiseArm(0);
-        sleep(1000);
-        move(0, 0.75, 0);
+        slideMiddle();
+        sleep(500);
+        move(-3000,0,0,1);
         sleep(1500);
-        move(-0.75,0,0);
-        sleep(550);
-        move(0,0,0);
-    } */
+        move(0,250,0,0.25);
+    }
 
     private void caseA() {
 
-        move(0, 50, 0, 0.5);
+        /*move(0, 50, 0, 0.5);
         sleep(300);
 
         gyroTurn(90);
@@ -443,77 +448,99 @@ public class RedSideAuto extends LinearOpMode {
         sleep(300);
 
         gyroTurn(0);
-        sleep(1000);
-
-
-        /*
+        sleep(1000);*/
         clawClose();
-        sleep(300);
-        move(0,150,0,0.5);
-        sleep(300);
+        gyroTurn(0);
+        //sleep(300);
+        move(0,-550,0,0.5);
+        sleep(1450);
         slideHigh();
-        sleep(500);
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
         move(-50,0,0,0.5);
-        sleep(500);
-        gyroTurn(10);
-        sleep(2000);
+        sleep(100);
         move(0,0,0,0.5);
-        sleep(500);
+        sleep(100);
         clawOpen();
-        sleep(1000);
+        sleep(100);
         move(15,0,0,0.5);
         sleep(500);
         move(0,0,0,0.5);
         slideDrop();
-        gyroTurn(90);
-        sleep(2000);
-        move(750,0,0,0.5);
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
         sleep(500);
-        //gyroTurn(90);
+        move(500,0,0,0.5);
         sleep(500);
-        move(0,-250,0,0.25);
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
+        sleep(250);
+        move(0,-750,0,0.5);
+        sleep(1750);
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
+        move(50,0,0,0.5);
+        sleep(500);
+        move(0,-50,0,0.5);
+        sleep(250);
         duckSpin();
-        sleep(500);
-        move(0,250,0,0.25);*/
+        sleep(250);
+        move(0,250,0,0.25);
+        //sleep(1000);
+
     }
 
-    /*private void caseC() {
-        sleep(3500);
-        wobbleServoHand.setPosition(1);
+    private void caseC() {
+        clawClose();
+        gyroTurn(0);
+        //sleep(300);
+        move(0,-550,0,0.5);
+        sleep(1450);
+        slideLow();
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        move(-50,0,0,0.5);
+        sleep(100);
+        move(0,0,0,0.5);
+        sleep(100);
+        clawOpen();
+        sleep(100);
+        move(15,0,0,0.5);
         sleep(500);
-        raiseArm(0.5);
-        sleep(200);
-        move(0.75, 0, 0);
-        sleep(3000);
-        autoShoot();
-        move(0.75, 0, 0);
-        sleep(2500);
-        move(0,0,0);
-        sleep(300);
-        move(0, 0, -0.5);
-        sleep(1250);
-        move(0.75,0,0);
-        sleep(2500);
-        move(0,0,0);
-        sleep(300);
-        lowerArm(0.5);
-        sleep(300);
-        lowerArm(0);
+        move(0,0,0,0.5);
+        slideDrop();
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
         sleep(500);
-        wobbleServoHand.setPosition(0);
-        sleep(200);
-        raiseArm(0.5);
-        sleep(300);
-        raiseArm(0);
-        sleep(1000);
-        move(-0.75, 0, 0);
-        sleep(1500);
-        move(0, 0, 0.5);
-        sleep(1500);
-        move(-0.75,0,0);
-        sleep(1250);
-        move(0,0,0);
-    } */
+        move(500,0,0,0.5);
+        sleep(500);
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
+        sleep(250);
+        move(0,-750,0,0.5);
+        sleep(1750);
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
+        move(50,0,0,0.5);
+        sleep(500);
+        move(0,-50,0,0.5);
+        sleep(250);
+        duckSpin();
+        sleep(250);
+        move(0,250,0,0.25);
+    }
 
     /**
      * Initialize the Vuforia localization engine.
@@ -616,7 +643,10 @@ public class RedSideAuto extends LinearOpMode {
         double delta = Math.abs((currentHeading - target_angle));
         telemetry.addData("delta : ", delta);
 
-        while (opModeIsActive() && delta >= 0.25) {
+        int i = 0;
+        int iMAX = 100;
+
+        while (i < iMAX && opModeIsActive() && delta > 0.4) {
 
             double error_degrees = (target_angle - currentHeading) % 360; //Compute Error
             //telemetry.addData("target_angle : ",target_angle);
@@ -637,7 +667,11 @@ public class RedSideAuto extends LinearOpMode {
             telemetry.addData("currentHeading : ", currentHeading);
             delta = Math.abs((currentHeading - target_angle));
             telemetry.addData("delta : ", delta);
+
+            i++;
+            telemetry.addData("i : ", i);
             telemetry.update();
+
         }
 
         sleep(500);

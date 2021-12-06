@@ -31,7 +31,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 
 public class Robot_OmniDrive {
-    int random = 0;
+    private int random = 10;
 
     //private DcMotor  leftDrive      = null;
     //private DcMotor  rightDrive     = null;
@@ -98,8 +98,8 @@ public class Robot_OmniDrive {
         rightWheelF.setDirection(DcMotor.Direction.REVERSE);
         rightWheelR.setDirection(DcMotor.Direction.REVERSE);
 
-        random = (int) (Math.random() * 10) + 1;
-
+        //random = (int) (Math.random() * 10) + 1;
+        random = 10;
 
         webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
 
@@ -297,11 +297,14 @@ public class Robot_OmniDrive {
         } else {
             returnMotor.setDirection(DcMotor.Direction.REVERSE);
         }
-
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        int target = 720;
+        int target = returnMotor.getCurrentPosition() + 270;
+        int max = 775;
 
+        if (target >= max) {
+            target = max;
+        }
         returnMotor.setTargetPosition(target);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
@@ -315,9 +318,16 @@ public class Robot_OmniDrive {
         } else {
             returnMotor.setDirection(DcMotor.Direction.REVERSE);
         }
+
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        int target = 425;
+        int target = returnMotor.getCurrentPosition() + 425;
+
+        int max = 425;
+
+        if (target >= max) {
+            target = max;
+        }
 
         returnMotor.setTargetPosition(target);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -361,8 +371,17 @@ public class Robot_OmniDrive {
         returnMotor.setPower(1);
     }
     private void slideDrop() {
+
+        //random = random + 1;
+
+        if (returnMotor.getDirection() == DcMotor.Direction.REVERSE)
+            random = 10;
+        else
+            random = 11;
+
         returnMotor.setPower(0);
-        random = random + 1;
+        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
     }
 }

@@ -29,9 +29,30 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+
+//package org.firstinspires.ftc.teamcode;
+
 //import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+/*import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -40,13 +61,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-import java.util.List;
+import java.util.List;*/
 
-//import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import java.util.List;
 
 /**
  * This 2020-2021 OpMode illustrates the basics of using the TensorFlow Object Detection API to
- * determine the position of the Freight Frenzy game elements.
+ * determine the position of the Ultimate Goal game elements.
  * <p>
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
@@ -54,21 +76,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-
-@Autonomous(name = "RedSideDetect", group = "Opmode RamEaters")
+@Autonomous(name = "RedSideAutoRight", group = "Opmode RamEaters")
 //@Disabled
-public class RedSideDetect extends LinearOpMode {
-    /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
-     * the following 4 detectable objects
-     *  0: Ball,
-     *  1: Cube,
-     *  2: Duck,
-     *  3: Marker (duck location tape marker)
-     *
-     *  Two additional model assets are available which only contain a subset of the objects:
-     *  FreightFrenzy_BC.tflite  0: Ball,  1: Cube
-     *  FreightFrenzy_DM.tflite  0: Duck,  1: Marker
-     */
+public class RedSideAutoRight extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
             //"Ball",
@@ -76,7 +86,6 @@ public class RedSideDetect extends LinearOpMode {
             "Duck",
             //"Marker"
     };
-
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
      * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
@@ -91,10 +100,6 @@ public class RedSideDetect extends LinearOpMode {
      */
     private static final String VUFORIA_KEY =
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
-
-
-    //private static final String VUFORIA_KEY =
-            //"AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
     private static final double TURN_P = 0.055;
     String test = "";
     private DcMotor leftWheelF = null;               //Left Wheel Front
@@ -108,14 +113,11 @@ public class RedSideDetect extends LinearOpMode {
     //private Robot_OmniDrive robot = new Robot_OmniDrive();
     private final ElapsedTime runtime = new ElapsedTime();
     private BNO055IMU imu;
-
-
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
      */
     private VuforiaLocalizer vuforia;
-
     /**
      * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
      * Detection engine.
@@ -126,12 +128,11 @@ public class RedSideDetect extends LinearOpMode {
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
-
         initVuforia();
         initTfod();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-        //imuInit();
+
 
 
         leftWheelF = hardwareMap.dcMotor.get("D1");
@@ -149,7 +150,6 @@ public class RedSideDetect extends LinearOpMode {
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-
         /**
          * Activate TensorFlow Object Detection before we wait for the start command.
          * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
@@ -162,85 +162,57 @@ public class RedSideDetect extends LinearOpMode {
             // If your target is at distance greater than 50 cm (20") you can adjust the magnification value
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
-            // (typically 16/9).
+            // (typically 1.78 or 16/9).
+
+            // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
+            //tfod.setZoom(3.5, 1.78);
+            //Sets the number of pixels to obscure on the left, top, right, and bottom edges of each image passed to the TensorFlow object detector. The size of the images are not changed, but the pixels in the margins are colored black.
+            //tfod.setClippingMargins(200,150,200,150);
             tfod.setZoom(1.15, 2.5);
         }
 
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start op mode");
-        telemetry.update();
-        waitForStart();
+        double a = getBatteryVoltage();
+        telemetry.addData("voltage", a);
 
+
+
+        telemetry.update();
+
+
+        waitForStart();
 
         if (opModeIsActive()) {
             int r1 = detectDuck();
             telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
                     r1);
+            telemetry.update();
+            //sleep(1000);
             imuInit();
+
+
             //hardcode for testing
+            caseA();
+
             /*if (r1 == 1) {
-                caseA();
-            } else if (r1 == 2) {
                 caseB();
-            } else {
+            } else if (r1 == 4) {
                 caseC();
-            }
-            telemetry.update();
-            sleep(10);*/
-            telemetry.update();
+            } else {
+                caseA();
+            }*/
+
+
+
         }
+
 
         if (tfod != null) {
             tfod.shutdown();
         }
-
     }
 
-    private int detectDuck() {
-
-        int iTimeOut = 5;
-        int j = 0;
-
-        while (opModeIsActive() && j < iTimeOut) {
-            if (tfod != null) {
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-
-                if (updatedRecognitions != null) {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    // step through the list of recognitions and display boundary info.
-                    int i = 0;
-                    for (Recognition recognition : updatedRecognitions) {
-                        if (recognition.getWidth() < 100 && recognition.getHeight() < 100
-                                && (0.75 < recognition.getWidth() / recognition.getHeight() || recognition.getWidth() / recognition.getHeight() < 1.25)) {
-
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  right (%d)", i), "%.03f"
-                                    , recognition.getRight() * 1000);
-                            if (recognition.getRight() * 1000 >= 400000) {
-                                return 1;
-                                //high
-                            } else if (recognition.getRight() * 1000 >= 200000) {
-                                return 2;
-                                //mid
-                            } else {
-                                return 3;
-                                //low
-                            }
-                            /*telemetry.addData(String.format("height (%d)", i), "%.00f"
-                                    , recognition.getHeight());
-                            telemetry.addData(String.format("width (%d)", i), "%.00f"
-                                    , recognition.getWidth());*/
-                        }
-                    }
-                }
-            }
-            sleep(500);
-            j++;
-        }
-        return 3;
-    }
 
     private void move(double drive,
                       double strafe,
@@ -304,7 +276,7 @@ public class RedSideDetect extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 1000);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 720);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -337,6 +309,29 @@ public class RedSideDetect extends LinearOpMode {
         returnMotor.setPower(0);
     }
 
+    /*private void autoShoot() {
+        move(0,0,0.25);
+        sleep(75);
+        move(0,0,0);
+        shoot(0.95);
+        sleep(500);
+        ringPush();
+        sleep(300);
+        move(0,1,0);
+        sleep(500);
+        move(0,0,0);
+        sleep(500);
+        ringPush();
+        sleep(300);
+        move(0,1,0);
+        sleep(300);
+        move(0,0,0);
+        sleep(500);
+        ringPush();
+        sleep(300);
+        shoot(0);
+    } */
+
     private void duckSpin() {
         duckWheel.setPower(0.75);
         sleep(2000);
@@ -354,6 +349,168 @@ public class RedSideDetect extends LinearOpMode {
         clawRight.setPosition(1);
     }
 
+    private int detectDuck() {
+
+        int iTimeOut = 5;
+        int j = 0;
+
+        while (opModeIsActive() && j < iTimeOut) {
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    // step through the list of recognitions and display boundary info.
+                    int i = 0;
+                    for (Recognition recognition : updatedRecognitions) {
+                        if (recognition.getWidth() < 100 && recognition.getHeight() < 100
+                                && (0.75 < recognition.getWidth() / recognition.getHeight() || recognition.getWidth() / recognition.getHeight() < 1.25)) {
+
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  right (%d)", i), "%.03f"
+                                    , recognition.getRight() * 1000);
+                            if (recognition.getRight() * 1000 >= 400000) {
+                                return 1;
+                                //high
+                            } else if (recognition.getRight() * 1000 >= 200000) {
+                                return 2;
+                                //mid
+                            } else {
+                                return 3;
+                                //low
+                            }
+                            /*telemetry.addData(String.format("height (%d)", i), "%.00f"
+                                    , recognition.getHeight());
+                            telemetry.addData(String.format("width (%d)", i), "%.00f"
+                                    , recognition.getWidth());*/
+                        }
+                    }
+                }
+            }
+            sleep(500);
+            j++;
+        }
+        return 3;
+    }
+
+    private void caseB() {
+        clawClose();
+        gyroTurn(0);
+        //sleep(300);
+        move(0,550,0,0.5);
+        sleep(1450);
+        slideMiddle();
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        move(-50,0,0,0.5);
+        sleep(100);
+        move(0,0,0,0.5);
+        sleep(100);
+        clawOpen();
+        sleep(100);
+        move(15,0,0,0.5);
+        sleep(500);
+        move(0,0,0,0.5);
+        slideDrop();
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
+        sleep(500);
+        slideMiddle();
+        sleep(500);
+        move(-3000,0,0,1);
+        sleep(1500);
+    }
+
+    private void caseA() {
+
+        /*move(0, 50, 0, 0.5);
+        sleep(300);
+
+        gyroTurn(90);
+        sleep(1000);
+
+        move(-50, 0, 0, 0.5);
+        sleep(300);
+
+
+        gyroTurn(-90);
+        sleep(1000);
+
+
+        move(0, 0, 50, 0.5);
+        sleep(300);
+
+        gyroTurn(0);
+        sleep(1000);*/
+        clawClose();
+        gyroTurn(0);
+        //sleep(300);
+        move(0,550,0,0.5);
+        sleep(1450);
+        slideHigh();
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        move(-50,0,0,0.5);
+        sleep(100);
+        move(0,0,0,0.5);
+        sleep(100);
+        clawOpen();
+        sleep(100);
+        move(15,0,0,0.5);
+        sleep(500);
+        move(0,0,0,0.5);
+        slideDrop();
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
+        sleep(500);
+        slideMiddle();
+        sleep(500);
+        move(-3000,0,0,1);
+        sleep(1500);
+
+    }
+
+    private void caseC() {
+        clawClose();
+        gyroTurn(0);
+        //sleep(300);
+        move(0,550,0,0.5);
+        sleep(1450);
+        slideLow();
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        move(-50,0,0,0.5);
+        sleep(100);
+        move(0,0,0,0.5);
+        sleep(100);
+        clawOpen();
+        sleep(100);
+        move(15,0,0,0.5);
+        sleep(500);
+        move(0,0,0,0.5);
+        slideDrop();
+        gyroTurn(-90);
+        sleep(100);
+        gyroTurn(-90);
+        sleep(500);
+        slideMiddle();
+        sleep(500);
+        move(-3000,0,0,1);
+        sleep(1500);
+    }
 
     /**
      * Initialize the Vuforia localization engine.
@@ -372,6 +529,42 @@ public class RedSideDetect extends LinearOpMode {
 
         // Loading trackables is not necessary for the TensorFlow Object Detection engine.
     }
+
+    double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        return result;
+    }
+
+    private double getFactorOfVoltage() {
+        double currentVoltage = getBatteryVoltage();
+        double mult;
+        if (currentVoltage >= 14.6) {
+            mult = 0.82;
+        } else if (currentVoltage >= 14.3) {
+            mult = 0.84;
+        } else if (currentVoltage >= 14.2) {
+            mult = 0.84;
+        } else if (currentVoltage >= 14.0) {
+            mult = 0.86;
+        } else if (currentVoltage >= 13.6) {
+            mult = 0.87;
+        } else if (currentVoltage >= 13.4) {
+            mult = 0.92;
+        } else if (currentVoltage <= 12.5) {
+            telemetry.addLine("Change the battery!");
+            mult = 1;
+        } else {
+            mult = 0.98;
+        }
+        return mult;
+    }
+
 
     /**
      * Initialize the TensorFlow Object Detection engine.
@@ -420,7 +613,10 @@ public class RedSideDetect extends LinearOpMode {
         double delta = Math.abs((currentHeading - target_angle));
         telemetry.addData("delta : ", delta);
 
-        while (opModeIsActive() && delta >= 0.25) {
+        int i = 0;
+        int iMAX = 100;
+
+        while (i < iMAX && opModeIsActive() && delta > 0.4) {
 
             double error_degrees = (target_angle - currentHeading) % 360; //Compute Error
             //telemetry.addData("target_angle : ",target_angle);
@@ -441,7 +637,11 @@ public class RedSideDetect extends LinearOpMode {
             telemetry.addData("currentHeading : ", currentHeading);
             delta = Math.abs((currentHeading - target_angle));
             telemetry.addData("delta : ", delta);
+
+            i++;
+            telemetry.addData("i : ", i);
             telemetry.update();
+
         }
 
         sleep(500);
@@ -455,3 +655,6 @@ public class RedSideDetect extends LinearOpMode {
 
     }
 }
+
+
+
