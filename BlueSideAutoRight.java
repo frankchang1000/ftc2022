@@ -100,7 +100,7 @@ public class BlueSideAutoRight extends LinearOpMode {
      */
     private static final String VUFORIA_KEY =
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
-    private static final double TURN_P = 0.055;
+    private static final double TURN_P = 0.05;
     String test = "";
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
@@ -193,7 +193,7 @@ public class BlueSideAutoRight extends LinearOpMode {
 
 
             //hardcode for testing
-            caseC();
+            caseLoc(2);
 
             /*if (r1 == 1) {
                 caseB();
@@ -286,7 +286,7 @@ public class BlueSideAutoRight extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 400);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 500);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -296,7 +296,7 @@ public class BlueSideAutoRight extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 150);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 350);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -334,9 +334,9 @@ public class BlueSideAutoRight extends LinearOpMode {
 
     private void duckSpin() {
         duckWheel.setPower(0.75);
-        sleep(2000);
+        sleep(3000);
         duckWheel.setPower(0);
-        sleep(200);
+        //sleep(200);
     }
 
     private void clawClose() {
@@ -395,142 +395,49 @@ public class BlueSideAutoRight extends LinearOpMode {
         return 3;
     }
 
-    private void caseB() {
-        clawClose();
-        gyroTurn(0);
-        //sleep(300);
-        move(0,550,0,0.5);
-        sleep(1450);
-        slideMiddle();
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        move(-50,0,0,0.5);
-        sleep(100);
-        move(0,0,0,0.5);
-        sleep(100);
-        clawOpen();
-        sleep(100);
-        move(15,0,0,0.5);
-        sleep(500);
-        move(0,0,0,0.5);
-        slideDrop();
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(500);
-        move(500,0,0,0.5);
-        sleep(500);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(250);
-        move(0,750,0,0.5);
-        sleep(1750);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        move(50,0,0,0.5);
-        sleep(500);
-        move(0,50,0,0.5);
-        sleep(250);
-        duckSpin();
-        sleep(250);
-        move(0,-250,0,0.25);
-    }
 
-    private void caseA() {
+    private void caseLoc(int loc) {
         clawClose();
-        gyroTurn(0);
+        //gyroTurn(0);
         //sleep(300);
-        move(0,550,0,0.5);
-        sleep(1450);
-        slideHigh();
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
+        //sleep(1450);
         move(-50,0,0,0.5);
+        if (loc == 1) {
+            //move(-5,0,0,0.25);
+            slideLow();
+        } else if (loc == 2) {
+            move(-8,0,0,0.25);
+            slideMiddle();
+        } else {
+            slideHigh();
+        }
         sleep(100);
-        move(0,0,0,0.5);
+        gyroTurn(45);
+        sleep(100);
+        move(-30,0,0,0.5);
         sleep(100);
         clawOpen();
         sleep(100);
-        move(15,0,0,0.5);
-        sleep(500);
-        move(0,0,0,0.5);
+        if (loc == 2) {
+            move(8,0,0,0.25);
+        }
+        move(25,0,0,0.5);
+        sleep(200);
         slideDrop();
-        gyroTurn(-90);
+        move(0,0,75,0.25);
+        gyroTurn(90);
+        move(700,0,0,0.25);
+        sleep(200);
+        move(0,0,-75,0.25);
         sleep(100);
-        gyroTurn(-90);
-        sleep(500);
-        move(500,0,0,0.5);
-        sleep(500);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(250);
-        move(0,750,0,0.5);
-        sleep(1750);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        move(50,0,0,0.5);
-        sleep(500);
-        move(0,50,0,0.5);
-        sleep(250);
+        gyroTurn(0);
+        //sleep(250);
+        move(0,-100,0,0.25);
+        move(250,0,0,0.15);
         duckSpin();
         sleep(250);
-        move(0,-250,0,0.25);
-    }
-
-    private void caseC() {
-        clawClose();
+        move(-250,0,0,0.25);
         gyroTurn(0);
-        //sleep(300);
-        move(0,550,0,0.5);
-        sleep(1450);
-        slideLow();
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        move(-50,0,0,0.5);
-        sleep(100);
-        move(0,0,0,0.5);
-        sleep(100);
-        clawOpen();
-        sleep(100);
-        move(15,0,0,0.5);
-        sleep(500);
-        move(0,0,0,0.5);
-        slideDrop();
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(500);
-        move(500,0,0,0.5);
-        sleep(500);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(250);
-        move(0,750,0,0.5);
-        sleep(1750);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        move(50,0,0,0.5);
-        sleep(500);
-        move(0,50,0,0.5);
-        sleep(250);
-        duckSpin();
-        sleep(250);
-        move(0,-250,0,0.25);
     }
 
     /**
@@ -635,7 +542,7 @@ public class BlueSideAutoRight extends LinearOpMode {
         telemetry.addData("delta : ", delta);
 
         int i = 0;
-        int iMAX = 100;
+        int iMAX = 75;
 
         while (i < iMAX && opModeIsActive() && delta > 0.4) {
 

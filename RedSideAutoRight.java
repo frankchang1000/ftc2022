@@ -100,7 +100,7 @@ public class RedSideAutoRight extends LinearOpMode {
      */
     private static final String VUFORIA_KEY =
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
-    private static final double TURN_P = 0.055;
+    private static final double TURN_P = 0.05;
     String test = "";
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
@@ -193,7 +193,7 @@ public class RedSideAutoRight extends LinearOpMode {
 
 
             //hardcode for testing
-            caseA();
+            caseLoc(2);
 
             /*if (r1 == 1) {
                 caseB();
@@ -395,39 +395,7 @@ public class RedSideAutoRight extends LinearOpMode {
         return 3;
     }
 
-    private void caseB() {
-        clawClose();
-        gyroTurn(0);
-        //sleep(300);
-        move(0,550,0,0.5);
-        sleep(1450);
-        slideMiddle();
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        move(-50,0,0,0.5);
-        sleep(100);
-        move(0,0,0,0.5);
-        sleep(100);
-        clawOpen();
-        sleep(100);
-        move(15,0,0,0.5);
-        sleep(500);
-        move(0,0,0,0.5);
-        slideDrop();
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(500);
-        slideMiddle();
-        sleep(500);
-        move(-3000,0,0,1);
-        sleep(1500);
-    }
-
-    private void caseA() {
+    private void caseLoc(int loc) {
 
         /*move(0, 50, 0, 0.5);
         sleep(300);
@@ -453,7 +421,16 @@ public class RedSideAutoRight extends LinearOpMode {
         //sleep(300);
         move(0,550,0,0.5);
         sleep(1450);
-        slideHigh();
+
+        if (loc == 1) {
+            move(-5,0,0,0.25);
+            slideLow();
+        } else if (loc == 2) {
+            move(-8,0,0,0.25);
+            slideMiddle();
+        } else {
+            slideHigh();
+        }
         sleep(100);
         gyroTurn(0);
         sleep(100);
@@ -467,50 +444,26 @@ public class RedSideAutoRight extends LinearOpMode {
         sleep(100);
         move(15,0,0,0.5);
         sleep(500);
-        move(0,0,0,0.5);
+        move(0,0,0,0);
         slideDrop();
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
+        move(0,0,-75,0.5);
         sleep(500);
+        gyroTurn(-90);
+        move(0,0,0,0);
+        //sleep(1000);
         slideMiddle();
         sleep(500);
-        move(-3000,0,0,1);
+        move(-50,0,0,0.25);
+        gyroTurn(-90);
+        //sleep(500);
+        move(-750, 0, 0, 0.25);
+        //back whell
+        move(-1900, 0, 0, 1);
+
         sleep(1500);
 
     }
 
-    private void caseC() {
-        clawClose();
-        gyroTurn(0);
-        //sleep(300);
-        move(0,550,0,0.5);
-        sleep(1450);
-        slideLow();
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        move(-50,0,0,0.5);
-        sleep(100);
-        move(0,0,0,0.5);
-        sleep(100);
-        clawOpen();
-        sleep(100);
-        move(15,0,0,0.5);
-        sleep(500);
-        move(0,0,0,0.5);
-        slideDrop();
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(500);
-        slideMiddle();
-        sleep(500);
-        move(-3000,0,0,1);
-        sleep(1500);
-    }
 
     /**
      * Initialize the Vuforia localization engine.

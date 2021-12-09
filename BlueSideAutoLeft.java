@@ -52,7 +52,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 //import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+/*import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -61,7 +61,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-import java.util.List;
+import java.util.List;*/
 
 
 import java.util.List;
@@ -100,7 +100,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
      */
     private static final String VUFORIA_KEY =
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
-    private static final double TURN_P = 0.055;
+    private static final double TURN_P = 0.05;
     String test = "";
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
@@ -193,7 +193,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
 
 
             //hardcode for testing
-            caseC();
+            caseLoc(3);
 
             /*if (r1 == 1) {
                 caseB();
@@ -286,7 +286,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 400);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 500);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -296,7 +296,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 150);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 300);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -395,40 +395,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
         return 3;
     }
 
-    private void caseB() {
-        clawClose();
-        gyroTurn(0);
-        //sleep(300);
-        move(0,-550,0,0.5);
-        sleep(1450);
-        slideLow();
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        move(-50,0,0,0.5);
-        sleep(100);
-        move(0,0,0,0.5);
-        sleep(100);
-        clawOpen();
-        sleep(100);
-        move(15,0,0,0.5);
-        sleep(500);
-        move(0,0,0,0.5);
-        slideDrop();
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(500);
-        slideMiddle();
-        sleep(500);
-        move(-3000,0,0,1);
-        sleep(1500);
-        move(0,250,0,0.25);
-    }
-
-    private void caseA() {
+    private void caseLoc(int loc) {
 
         /*move(0, 50, 0, 0.5);
         sleep(300);
@@ -450,97 +417,58 @@ public class BlueSideAutoLeft extends LinearOpMode {
         gyroTurn(0);
         sleep(1000);*/
         clawClose();
-        gyroTurn(0);
+        //gyroTurn(0);
         //sleep(300);
-        move(0,-550,0,0.5);
-        sleep(1450);
-        slideHigh();
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        move(-50,0,0,0.5);
+        move(-35,0,0,0.5);
         sleep(100);
         move(0,0,0,0.5);
+
+        //sleep(1450);
+        if (loc == 1) {
+            move(-5,0,0,0.25);
+            slideLow();
+        } else if (loc == 2) {
+            move(-10,0,0,0.25);
+            slideMiddle();
+        } else {
+            move(-5,0,0,0.25);
+            slideHigh();
+        }
+        gyroTurn(-45);
+        move(-35,0,0,0.5);
+
         sleep(100);
         clawOpen();
         sleep(100);
         move(15,0,0,0.5);
+        if (loc == 2) {
+            move(10,0,0,0.25);
+        } else if (loc == 1) {
+            move(5,0,0,0.25);
+        } else {
+            move(5,0,0,0.25);
+        }
         sleep(500);
-        move(0,0,0,0.5);
+        move(0,0,0,0);
         slideDrop();
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
+        move(0,0,75,0.5);
         sleep(500);
-        move(500,0,0,0.5);
-        sleep(500);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(250);
-        move(0,-750,0,0.5);
-        sleep(1750);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        move(50,0,0,0.5);
-        sleep(500);
-        move(0,-50,0,0.5);
-        sleep(250);
-        duckSpin();
-        sleep(250);
-        move(0,250,0,0.25);
+        gyroTurn(90);
+        move(0,0,0,0);
         //sleep(1000);
+        slideMiddle();
+        sleep(500);
+        move(-50,0,0,0.25);
+        gyroTurn(90);
+        //sleep(500);
+        move(-750, 0, 0, 0.25);
+        //back whell
+        //move(-1900, 0, 0, 1);
+
+        sleep(1500);
 
     }
 
-    private void caseC() {
-        clawClose();
-        gyroTurn(0);
-        //sleep(300);
-        move(0,-550,0,0.5);
-        sleep(1450);
-        slideLow();
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        gyroTurn(0);
-        sleep(100);
-        move(-50,0,0,0.5);
-        sleep(100);
-        move(0,0,0,0.5);
-        sleep(100);
-        clawOpen();
-        sleep(100);
-        move(15,0,0,0.5);
-        sleep(500);
-        move(0,0,0,0.5);
-        slideDrop();
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(500);
-        move(500,0,0,0.5);
-        sleep(500);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        sleep(250);
-        move(0,-750,0,0.5);
-        sleep(1750);
-        gyroTurn(-90);
-        sleep(100);
-        gyroTurn(-90);
-        move(50,0,0,0.5);
-        sleep(500);
-        move(0,-50,0,0.5);
-        sleep(250);
-        duckSpin();
-        sleep(250);
-        move(0,250,0,0.25);
-    }
 
     /**
      * Initialize the Vuforia localization engine.
