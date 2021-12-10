@@ -10,9 +10,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
-@Autonomous(name = "DuckScan", group = "Opmode RamEaters")
+@Autonomous(name = "DuckScan_Right", group = "Opmode RamEaters")
 //@Disabled
-public class DuckScan extends LinearOpMode {
+public class DuckScan_Right extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
             //"Ball",
@@ -49,11 +49,12 @@ public class DuckScan extends LinearOpMode {
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
             //tfod.setZoom(3.5, 1.78);
             //Sets the number of pixels to obscure on the left, top, right, and bottom edges of each image passed to the TensorFlow object detector. The size of the images are not changed, but the pixels in the margins are colored black.
-            //tfod.setClippingMargins(200,150,200,150);
-            tfod.setZoom(1.15, 2.5);
+            tfod.setClippingMargins(120,160,120,160);
+            tfod.setZoom(1.7, 2.5);
         }
 
-        telemetry.update();
+        //telemetry.update();
+        sleep(2000);
         waitForStart();
 
         if (opModeIsActive()) {
@@ -76,7 +77,7 @@ public class DuckScan extends LinearOpMode {
 
         int iTimeOut = 5;
         int j = 0;
-        int r_pos = 3;
+        int r_pos = 1;
 
         while (opModeIsActive() && j < iTimeOut) {
             if (tfod != null) {
@@ -97,53 +98,29 @@ public class DuckScan extends LinearOpMode {
                                     , recognition.getRight() * 1000);
 
                             // Robot is place on Right side
-                            int pos1_right = 300000;
+                            int pos1_right = 340000;
                             int pos2_right = 150000;
+
                             if (recognition.getRight() * 1000 >= pos1_right) {
 
-                                telemetry.addData("Right pos", 1);
-                                r_pos = 1;
                                 //high
-                                //return 1;
+                                telemetry.addData("Right pos", 3);
+                                r_pos = 3;
+                                //return 3;
 
                             } else if (recognition.getRight() * 1000 >= pos2_right) {
 
+                                //mid
                                 telemetry.addData("Right pos", 2);
                                 r_pos = 2;
-                                //mid
                                 //return 2;
 
                             } else {
-                                telemetry.addData("Right pos", 3);
-                                r_pos = 3;
+
                                 //low
-                                //return 3;
-
-                            }
-
-                            // Robot is place on Left side
-                            int pos1_left = 390000;
-                            int pos2_left = 150000;
-                            if (recognition.getRight() * 1000 >= pos1_left) {
-
-                                telemetry.addData("Left pos", 1);
+                                telemetry.addData("Right pos", 1);
                                 r_pos = 1;
-                                //high
                                 //return 1;
-
-                            } else if (recognition.getRight() * 1000 >= pos2_left) {
-
-                                telemetry.addData("Left pos", 2);
-                                r_pos = 2;
-                                //mid
-                                //return 2;
-
-                            } else {
-
-                                telemetry.addData("Left pos", 3);
-                                r_pos = 3;
-                                //low
-                                //return 3;
 
                             }
 

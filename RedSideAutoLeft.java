@@ -167,8 +167,8 @@ public class RedSideAutoLeft extends LinearOpMode {
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
             //tfod.setZoom(3.5, 1.78);
             //Sets the number of pixels to obscure on the left, top, right, and bottom edges of each image passed to the TensorFlow object detector. The size of the images are not changed, but the pixels in the margins are colored black.
-            //tfod.setClippingMargins(200,150,200,150);
-            tfod.setZoom(1.15, 2.5);
+            tfod.setClippingMargins(120,160,120,160);
+            tfod.setZoom(1.7, 2.5);
         }
 
         /** Wait for the game to begin */
@@ -302,29 +302,6 @@ public class RedSideAutoLeft extends LinearOpMode {
         returnMotor.setPower(0);
     }
 
-    /*private void autoShoot() {
-        move(0,0,0.25);
-        sleep(75);
-        move(0,0,0);
-        shoot(0.95);
-        sleep(500);
-        ringPush();
-        sleep(300);
-        move(0,1,0);
-        sleep(500);
-        move(0,0,0);
-        sleep(500);
-        ringPush();
-        sleep(300);
-        move(0,1,0);
-        sleep(300);
-        move(0,0,0);
-        sleep(500);
-        ringPush();
-        sleep(300);
-        shoot(0);
-    } */
-
     private void duckSpin() {
         duckWheel.setPower(0.75);
         sleep(3000);
@@ -370,20 +347,34 @@ public class RedSideAutoLeft extends LinearOpMode {
                             telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
                             telemetry.addData(String.format("  right (%d)", i), "%.03f"
                                     , recognition.getRight() * 1000);
-                            if (recognition.getRight() * 1000 >= 400000) {
-                                return 1;
+
+                            // Robot is place on Left side
+                            int pos1_left = 350000;
+                            int pos2_left = 150000;
+
+                            if (recognition.getRight() * 1000 >= pos1_left) {
+
+                                telemetry.addData("Left pos", 3);
+                                //r_pos = 3;
                                 //high
-                            } else if (recognition.getRight() * 1000 >= 200000) {
-                                return 2;
-                                //mid
-                            } else {
                                 return 3;
+
+                            } else if (recognition.getRight() * 1000 >= pos2_left) {
+
+                                telemetry.addData("Left pos", 2);
+                                //r_pos = 2;
+                                //mid
+                                return 2;
+
+                            } else {
+
+                                telemetry.addData("Left pos", 1);
+                                //r_pos = 1;
                                 //low
+                                return 1;
+
                             }
-                            /*telemetry.addData(String.format("height (%d)", i), "%.00f"
-                                    , recognition.getHeight());
-                            telemetry.addData(String.format("width (%d)", i), "%.00f"
-                                    , recognition.getWidth());*/
+
                         }
                     }
                 }
@@ -391,7 +382,7 @@ public class RedSideAutoLeft extends LinearOpMode {
             sleep(500);
             j++;
         }
-        return 3;
+        return 1;
     }
 
 
