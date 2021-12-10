@@ -218,10 +218,10 @@ public class Robot_OmniDrive {
 
         if (myOpMode.gamepad2.right_bumper) {
             clawLeft.setPosition(0);
-            clawRight.setPosition(1);
+            clawRight.setPosition(0.50);
         } else if (myOpMode.gamepad2.left_bumper) {
-            clawLeft.setPosition(0.5);
-            clawRight.setPosition(0.5);
+            clawLeft.setPosition(0.09);
+            clawRight.setPosition(0.37);
         }
 
 
