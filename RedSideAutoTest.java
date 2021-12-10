@@ -191,17 +191,10 @@ public class RedSideAutoTest extends LinearOpMode {
             sleep(1000);
             imuInit();
 
-
             //hardcode for testing
-            caseA();
-            
-            /*if (r1 == 1) {
-                caseB();
-            } else if (r1 == 4) {
-                caseC();
-            } else {
-                caseA();
-            }*/
+            //caseLoc(3);
+
+            caseLoc(r1);
 
 
 
@@ -340,13 +333,19 @@ public class RedSideAutoTest extends LinearOpMode {
     }
 
     private void clawClose() {
-        clawLeft.setPosition(0.5);
-        clawRight.setPosition(0.5);
+        //clawLeft.setPosition(0.5);
+        //clawRight.setPosition(0.5);
+        //close
+        clawLeft.setPosition(0.09);
+        clawRight.setPosition(0.37);
     }
 
     private void clawOpen() {
+        //clawLeft.setPosition(0);
+        //clawRight.setPosition(1);
+        //open
         clawLeft.setPosition(0);
-        clawRight.setPosition(1);
+        clawRight.setPosition(0.50);
     }
 
     private int detectDuck() {
@@ -395,39 +394,7 @@ public class RedSideAutoTest extends LinearOpMode {
         return 3;
     }
 
-    /*private void caseB() {
-        sleep(3500);
-        wobbleServoHand.setPosition(1);
-        sleep(500);
-        raiseArm(0.5);
-        sleep(200);
-        move(0.75, 0, 0);
-        sleep(3000);
-        autoShoot();
-        move(0.75, 0, 0);
-        sleep(2500);
-        move(0, -1, 0);
-        sleep(2000);
-        move(0,0,0);
-        sleep(300);
-        lowerArm(0.5);
-        sleep(300);
-        lowerArm(0);
-        sleep(500);
-        wobbleServoHand.setPosition(0);
-        sleep(200);
-        raiseArm(0.5);
-        sleep(300);
-        raiseArm(0);
-        sleep(1000);
-        move(0, 0.75, 0);
-        sleep(1500);
-        move(-0.75,0,0);
-        sleep(550);
-        move(0,0,0);
-    } */
-
-    private void caseA() {
+    private void caseLoc(int loc) {
 
 
         move(0, 1000, 0, 0.25);
@@ -449,6 +416,17 @@ public class RedSideAutoTest extends LinearOpMode {
 
 
         move(0, 0, 0, 1);
+
+
+        if (loc == 1) {
+            //move(-5,0,0,0.25);
+            slideLow();
+        } else if (loc == 2) {
+            move(-8,0,0,0.25);
+            slideMiddle();
+        } else {
+            slideHigh();
+        }
 
         // move(-1000, 0, 0, 1);
         //sleep(500);
@@ -504,43 +482,7 @@ public class RedSideAutoTest extends LinearOpMode {
         move(0,250,0,0.25);*/
     }
 
-    /*private void caseC() {
-        sleep(3500);
-        wobbleServoHand.setPosition(1);
-        sleep(500);
-        raiseArm(0.5);
-        sleep(200);
-        move(0.75, 0, 0);
-        sleep(3000);
-        autoShoot();
-        move(0.75, 0, 0);
-        sleep(2500);
-        move(0,0,0);
-        sleep(300);
-        move(0, 0, -0.5);
-        sleep(1250);
-        move(0.75,0,0);
-        sleep(2500);
-        move(0,0,0);
-        sleep(300);
-        lowerArm(0.5);
-        sleep(300);
-        lowerArm(0);
-        sleep(500);
-        wobbleServoHand.setPosition(0);
-        sleep(200);
-        raiseArm(0.5);
-        sleep(300);
-        raiseArm(0);
-        sleep(1000);
-        move(-0.75, 0, 0);
-        sleep(1500);
-        move(0, 0, 0.5);
-        sleep(1500);
-        move(-0.75,0,0);
-        sleep(1250);
-        move(0,0,0);
-    } */
+
 
     /**
      * Initialize the Vuforia localization engine.

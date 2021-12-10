@@ -32,7 +32,7 @@ public class Robot_Control extends LinearOpMode {
 
     /* Declare OpMode members. */
     Robot_OmniDrive robot = new Robot_OmniDrive();   // Use Omni-Directional drive system
-    Robot_Navigation nav = new Robot_Navigation();  // Use Image Tracking library
+    //Robot_Navigation nav = new Robot_Navigation();  // Use Image Tracking library
 
 
     @Override
@@ -40,11 +40,11 @@ public class Robot_Control extends LinearOpMode {
 
         // Initialize the robot and navigation
         robot.initDrive(this);
-        nav.initVuforia(this, robot);
+        //nav.initVuforia(this, robot);
 
 
         // Activate Vuforia (this takes a few seconds)
-        nav.activateTracking();
+        //nav.activateTracking();
 
         // Wait for the game to start (driver presses PLAY)
         while (!isStarted()) {
@@ -52,7 +52,7 @@ public class Robot_Control extends LinearOpMode {
             telemetry.addData(">", "Press start");
 
             // Display any Nav Targets while we wait for the match to start
-            nav.targetsAreVisible();
+            //nav.targetsAreVisible();
             //nav.addNavTelemetry();
 
             telemetry.update();
@@ -67,14 +67,14 @@ public class Robot_Control extends LinearOpMode {
             // auto drive or manual drive?
             // In auto drive, the robot will approach any target it can see and then press against it
             // In manual drive the robot responds to the Joystick.
-            if (nav.targetsAreVisible() && gamepad1.left_bumper) {
+            //if (nav.targetsAreVisible() && gamepad1.left_bumper) {
                 // Calculate automatic target approach
-                nav.cruiseControl(TARGET_DISTANCE);
+               // nav.cruiseControl(TARGET_DISTANCE);
 
-            } else {
+            //} else {
                 // Drive the robot using the joysticks
                 robot.manualDrive();
-            }
+            //}
 
             // Build telemetry messages with Navigation Information;
             // nav.addNavTelemetry();

@@ -191,17 +191,10 @@ public class BlueSideAutoRight extends LinearOpMode {
             //sleep(1000);
             imuInit();
 
-
             //hardcode for testing
-            caseLoc(2);
+            //caseLoc(3);
 
-            /*if (r1 == 1) {
-                caseB();
-            } else if (r1 == 4) {
-                caseC();
-            } else {
-                caseA();
-            }*/
+            caseLoc(r1);
 
 
 
@@ -340,13 +333,19 @@ public class BlueSideAutoRight extends LinearOpMode {
     }
 
     private void clawClose() {
-        clawLeft.setPosition(0.5);
-        clawRight.setPosition(0.5);
+        //clawLeft.setPosition(0.5);
+        //clawRight.setPosition(0.5);
+        //close
+        clawLeft.setPosition(0.09);
+        clawRight.setPosition(0.37);
     }
 
     private void clawOpen() {
+        //clawLeft.setPosition(0);
+        //clawRight.setPosition(1);
+        //open
         clawLeft.setPosition(0);
-        clawRight.setPosition(1);
+        clawRight.setPosition(0.50);
     }
 
     private int detectDuck() {

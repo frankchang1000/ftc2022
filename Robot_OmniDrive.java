@@ -217,9 +217,11 @@ public class Robot_OmniDrive {
         //myOpMode.telemetry.addData("Wheels", "L[%+5.2f], R[%+5.2f], B[%+5.2f]", left, right, back);
 
         if (myOpMode.gamepad2.right_bumper) {
+            //open
             clawLeft.setPosition(0);
             clawRight.setPosition(0.50);
         } else if (myOpMode.gamepad2.left_bumper) {
+            //close
             clawLeft.setPosition(0.09);
             clawRight.setPosition(0.37);
         }
