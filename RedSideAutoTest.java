@@ -82,8 +82,8 @@ public class RedSideAutoTest extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
             //"Ball",
-            //"Cube",
-            "Duck",
+            "Cube",
+            //"Duck",
             //"Marker"
     };
     /*
@@ -398,21 +398,24 @@ public class RedSideAutoTest extends LinearOpMode {
 
 
         move(0, 1000, 0, 0.25);
+        move(0, 1000, 0, 0.25);
+
         sleep(500);
 
 
         move(0, -1000, 0, 0.25);
+        move(0,-1000,0,0.25);
         sleep(500);
 
 
         // 5-10 inch to the bar
 
         //front whell
-        move(-600, 0, 0, 0.25);
+        //move(-600, 0, 0, 0.25);
 
 
         //back whell
-        move(-10000, 0, 0, 1);
+        //move(-10000, 0, 0, 1);
 
 
         move(0, 0, 0, 1);
@@ -430,8 +433,8 @@ public class RedSideAutoTest extends LinearOpMode {
 
         // move(-1000, 0, 0, 1);
         //sleep(500);
-        
-        
+
+
          /*
         gyroTurn(90);
         sleep(1000);
@@ -451,7 +454,7 @@ public class RedSideAutoTest extends LinearOpMode {
         sleep(1000);
 
 
-       
+
         clawClose();
         sleep(300);
         move(0,150,0,0.5);

@@ -82,8 +82,8 @@ public class RedSideAutoLeft extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
             //"Ball",
-            //"Cube",
-            "Duck",
+            "Cube",
+            //"Duck",
             //"Marker"
     };
     /*
@@ -289,7 +289,7 @@ public class RedSideAutoLeft extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 350);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 200);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -390,8 +390,8 @@ public class RedSideAutoLeft extends LinearOpMode {
         clawClose();
         gyroTurn(0);
         //sleep(300);
-        move(0,-300,0,0.20);
         move(0,-250,0,0.20);
+        move(0,-50,0,0.15);
         //sleep(1450);
 
         if (loc == 1) {
@@ -416,15 +416,17 @@ public class RedSideAutoLeft extends LinearOpMode {
         if (loc == 2) {
             move(8,0,0,0.25);
         }
-        move(25,0,0,0.5);
-        sleep(200);
+        move(75,0,0,0.5);
+        sleep(500);
+        move(0,75,0,0.5);
+        sleep(100);
         move(0,0,0,0.5);
         slideDrop();
-        move(0,0,-75,0.5);
+        move(0,0,-80,0.5);
         sleep(200);
-        gyroTurn(-90);
+        gyroTurn(-95);
         sleep(100);
-        gyroTurn(-90);
+        gyroTurn(-95);
         sleep(200);
         move(1400,0,0,0.5);
         move(1100,0,0,0.25);
@@ -434,7 +436,7 @@ public class RedSideAutoLeft extends LinearOpMode {
         gyroTurn(-90);
         sleep(250);
         move(0,-100,0,0.25);
-        move(0,-1000,0,0.15);
+        move(0,-100,0,0.15);
         gyroTurn(-90);
         sleep(100);
         gyroTurn(-90);
@@ -508,7 +510,7 @@ public class RedSideAutoLeft extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.50f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);

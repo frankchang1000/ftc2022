@@ -82,8 +82,8 @@ public class RedSideAutoRight extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
             //"Ball",
-            //"Cube",
-            "Duck",
+            "Cube",
+            //"Duck",
             //"Marker"
     };
     /*
@@ -410,7 +410,7 @@ public class RedSideAutoRight extends LinearOpMode {
         gyroTurn(0);
         //sleep(300);
         move(0,550,0,0.5);
-        sleep(1450);
+        sleep(1050);
 
         if (loc == 1) {
             move(-5,0,0,0.25);
@@ -432,7 +432,7 @@ public class RedSideAutoRight extends LinearOpMode {
         sleep(100);
         clawOpen();
         sleep(100);
-        move(15,0,0,0.5);
+        move(35,0,0,0.5);
         sleep(500);
         move(0,0,0,0);
         slideDrop();
@@ -449,6 +449,7 @@ public class RedSideAutoRight extends LinearOpMode {
         move(-750, 0, 0, 0.25);
         //back whell
         move(-1900, 0, 0, 1);
+        move(-300,0,0,1);
 
         sleep(1500);
 
@@ -516,7 +517,7 @@ public class RedSideAutoRight extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.50f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);

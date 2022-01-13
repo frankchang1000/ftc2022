@@ -82,8 +82,8 @@ public class BlueSideAutoLeft extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
             //"Ball",
-            //"Cube",
-            "Duck",
+            "Cube",
+            //"Duck",
             //"Marker"
     };
     /*
@@ -406,11 +406,13 @@ public class BlueSideAutoLeft extends LinearOpMode {
         gyroTurn(0);
         sleep(1000);*/
         clawClose();
+        sleep(300);
         //gyroTurn(0);
         //sleep(300);
-        move(-35,0,0,0.5);
+        move(0,-250,0,0.2);
+        move(0,-150,0,0.2);
         sleep(100);
-        move(0,0,0,0.5);
+        gyroTurn(0);
 
         //sleep(1450);
         if (loc == 1) {
@@ -423,13 +425,14 @@ public class BlueSideAutoLeft extends LinearOpMode {
             move(-5,0,0,0.25);
             slideHigh();
         }
-        gyroTurn(-45);
-        move(-35,0,0,0.5);
-
+        move(-175,0,0,0.2);
+        sleep(200);
+        gyroTurn(0);
         sleep(100);
         clawOpen();
         sleep(100);
         move(15,0,0,0.5);
+
         if (loc == 2) {
             move(10,0,0,0.25);
         } else if (loc == 1) {
@@ -447,12 +450,16 @@ public class BlueSideAutoLeft extends LinearOpMode {
         //sleep(1000);
         slideMiddle();
         sleep(500);
-        move(-50,0,0,0.25);
+        move(-100,0,0,0.25);
+        sleep(100);
         gyroTurn(90);
         //sleep(500);
+        sleep(100);
+        gyroTurn(90);
         move(-750, 0, 0, 0.25);
         //back whell
-        //move(-1900, 0, 0, 1);
+        move(-1500, 0, 0, 1);
+        move(-500,0,0,1);
 
         sleep(1500);
 
@@ -520,7 +527,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.50f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);

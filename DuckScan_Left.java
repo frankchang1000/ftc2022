@@ -18,8 +18,8 @@ public class DuckScan_Left extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
             //"Ball",
-            //"Cube",
-            "Duck",
+            "Cube",
+            //"Duck",
             //"Marker"
     };
 
@@ -101,7 +101,7 @@ public class DuckScan_Left extends LinearOpMode {
                             // Robot is place on Left side
                             int pos1_left = 350000;
                             int pos2_left = 150000;
-                            
+
                             if (recognition.getRight() * 1000 >= pos1_left) {
 
                                 // high
@@ -167,7 +167,7 @@ public class DuckScan_Left extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.50f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
