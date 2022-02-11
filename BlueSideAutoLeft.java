@@ -81,10 +81,10 @@ import java.util.List;
 public class BlueSideAutoLeft extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
     private static final String[] LABELS = {
-            //"Ball",
+            "Ball",
             "Cube",
-            //"Duck",
-            //"Marker"
+            "Duck",
+            "Marker"
     };
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
