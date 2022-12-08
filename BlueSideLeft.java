@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,6 +38,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import android.os.Environment;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -52,7 +55,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 //import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+/*import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -61,7 +64,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-import java.util.List;
+import java.util.List;*/
 
 
 import java.util.List;
@@ -76,15 +79,17 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "RedSideAutoTest", group = "Opmode RamEaters")
+@Autonomous(name = "BlueSideLeft", group = "Opmode RamEaters")
 //@Disabled
-public class RedSideAutoTest extends LinearOpMode {
-    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
+public class BlueSideLeft extends LinearOpMode {
+
+    private static final String TFOD_MODEL_ASSET = String.format("%s/FIRST/tflitemodels/stationary.tflite", Environment.getExternalStorageDirectory().getAbsolutePath());
+
+
     private static final String[] LABELS = {
-            //"Ball",
-            "Cube",
-            //"Duck",
-            //"Marker"
+            "1",
+            "2",
+            "3"
     };
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -100,16 +105,22 @@ public class RedSideAutoTest extends LinearOpMode {
      */
     private static final String VUFORIA_KEY =
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
-    private static final double TURN_P = 0.055;
+    private static final double TURN_P = 0.05;
     String test = "";
+
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
     private DcMotor rightWheelF = null;              //Right Wheel Front
     private DcMotor rightWheelR = null;
+
+    private DcMotor slideMotor = null;
+
     private Servo clawLeft = null;
     private Servo clawRight = null;
-    private DcMotor duckWheel = null;
-    private DcMotor returnMotor = null;
+
+    private ColorSensor color;
+
+    private int stopThreadRunning = 0;
     //private Robot_OmniDrive robot = new Robot_OmniDrive();
     private final ElapsedTime runtime = new ElapsedTime();
     private BNO055IMU imu;
@@ -133,22 +144,28 @@ public class RedSideAutoTest extends LinearOpMode {
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
+        leftWheelF = hardwareMap.get(DcMotor.class, "D1");
+        rightWheelF = hardwareMap.get(DcMotor.class, "D2");
+        leftWheelR = hardwareMap.get(DcMotor.class, "D3");
+        rightWheelR = hardwareMap.get(DcMotor.class, "D4");
+        color = hardwareMap.get(ColorSensor.class, "color");
+        slideMotor = hardwareMap.get(DcMotor.class, "slide");
+        clawLeft = hardwareMap.get(Servo.class, "clawLeft");
+        clawRight = hardwareMap.get(Servo.class, "clawRight");
 
 
-        leftWheelF = hardwareMap.dcMotor.get("D1");
-        rightWheelF = hardwareMap.dcMotor.get("D2");
-        leftWheelR = hardwareMap.dcMotor.get("D3");
-        rightWheelR = hardwareMap.dcMotor.get("D4");
-        //color = myOpMode.hardwareMap.get(ColorSensor.class, "Color");
+        leftWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        clawLeft = hardwareMap.get(Servo.class, "CL");
-        clawRight = hardwareMap.get(Servo.class, "CR");
-        duckWheel = hardwareMap.get(DcMotor.class, "duck");
-        returnMotor = hardwareMap.get(DcMotor.class, "return");
+        leftWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-
-        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         /**
          * Activate TensorFlow Object Detection before we wait for the start command.
@@ -167,8 +184,7 @@ public class RedSideAutoTest extends LinearOpMode {
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
             //tfod.setZoom(3.5, 1.78);
             //Sets the number of pixels to obscure on the left, top, right, and bottom edges of each image passed to the TensorFlow object detector. The size of the images are not changed, but the pixels in the margins are colored black.
-            tfod.setClippingMargins(120,160,120,160);
-            tfod.setZoom(1.7, 2.5);
+            tfod.setZoom(1, 1280.0/852);
         }
 
         /** Wait for the game to begin */
@@ -184,17 +200,17 @@ public class RedSideAutoTest extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            int r1 = detectDuck();
-            telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
-                    r1);
-            telemetry.update();
-            sleep(1000);
+            //int r1 = detectCone();
+            //telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
+            //        r1);
+            //telemetry.update();
+            //sleep(1000);
             imuInit();
 
             //hardcode for testing
             //caseLoc(3);
 
-            caseLoc(r1);
+            caseLoc(1);
 
 
 
@@ -222,19 +238,6 @@ public class RedSideAutoTest extends LinearOpMode {
         powerRightF = drive - strafe - rotate;
         powerRightR = drive + strafe - rotate;
 
-        telemetry.addData("LeftWheelF 0=%d", leftWheelF.getCurrentPosition());
-
-
-        leftWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        leftWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
 
         leftWheelF.setTargetPosition(leftWheelF.getCurrentPosition() + (int) (-powerLeftF));
         leftWheelR.setTargetPosition(leftWheelR.getCurrentPosition() + (int) (-powerLeftR));
@@ -252,9 +255,6 @@ public class RedSideAutoTest extends LinearOpMode {
         rightWheelF.setPower(power);
         rightWheelR.setPower(power);
 
-        telemetry.addData("LeftWheelF 1=%d", leftWheelF.getCurrentPosition());
-        telemetry.update();
-
 
         sleep(500);
 
@@ -262,14 +262,15 @@ public class RedSideAutoTest extends LinearOpMode {
         leftWheelR.setPower(0);
         rightWheelF.setPower(0);
         rightWheelR.setPower(0);
-    }
 
+    }
+    /*
     private void slideHigh() {
         //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 1000);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 720);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -301,46 +302,57 @@ public class RedSideAutoTest extends LinearOpMode {
 
         returnMotor.setPower(0);
     }
+    */
 
-    /*private void autoShoot() {
-        move(0,0,0.25);
-        sleep(75);
-        move(0,0,0);
-        shoot(0.95);
-        sleep(500);
-        ringPush();
-        sleep(300);
-        move(0,1,0);
-        sleep(500);
-        move(0,0,0);
-        sleep(500);
-        ringPush();
-        sleep(300);
-        move(0,1,0);
-        sleep(300);
-        move(0,0,0);
-        sleep(500);
-        ringPush();
-        sleep(300);
-        shoot(0);
-    } */
+    private void slideHigh() {
+        int target = 3500;
+        int max = 3500;
 
-    private void duckSpin() {
-        duckWheel.setPower(0.75);
-        sleep(2000);
-        duckWheel.setPower(0);
-        sleep(200);
+        if (target >= max) {
+            target = max;
+        }
+        slideMotor.setTargetPosition(target);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+
     }
 
-    private void clawClose() {
+    private void slideMid() {
+
+        int target = 2700;
+
+        int max = 2700;
+
+        if (target >= max) {
+            target = max;
+        }
+
+        slideMotor.setTargetPosition(target);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+    }
+
+    private void slideLow() {
+        int target = 750;
+        int max = 750;
+
+        if (target >= max) {
+            target = max;
+        }
+        slideMotor.setTargetPosition(target);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+    }
+
+    private void clawOpen() {
         //clawLeft.setPosition(0.5);
         //clawRight.setPosition(0.5);
         //close
         clawLeft.setPosition(0.09);
-        clawRight.setPosition(0.37);
+        clawRight.setPosition(0.41);
     }
 
-    private void clawOpen() {
+    private void clawClose() {
         //clawLeft.setPosition(0);
         //clawRight.setPosition(1);
         //open
@@ -348,7 +360,13 @@ public class RedSideAutoTest extends LinearOpMode {
         clawRight.setPosition(0.50);
     }
 
-    private int detectDuck() {
+    private void slideDrop() {
+        slideMotor.setTargetPosition(0);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+    }
+
+    private int detectCone() {
 
         int iTimeOut = 5;
         int j = 0;
@@ -370,20 +388,34 @@ public class RedSideAutoTest extends LinearOpMode {
                             telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
                             telemetry.addData(String.format("  right (%d)", i), "%.03f"
                                     , recognition.getRight() * 1000);
-                            if (recognition.getRight() * 1000 >= 400000) {
-                                return 1;
+
+                            // Robot is place on Right side
+                            int pos1_right = 340000;
+                            int pos2_right = 150000;
+
+                            if (recognition.getRight() * 1000 >= pos1_right) {
+
+                                telemetry.addData("Right pos", 3);
+                                //r_pos = 3;
                                 //high
-                            } else if (recognition.getRight() * 1000 >= 200000) {
-                                return 2;
-                                //mid
-                            } else {
                                 return 3;
+
+                            } else if (recognition.getRight() * 1000 >= pos2_right) {
+
+                                telemetry.addData("Right pos", 2);
+                                //r_pos = 2;
+                                //mid
+                                return 2;
+
+                            } else {
+
+                                telemetry.addData("Right pos", 1);
+                                //r_pos = 1;
                                 //low
+                                return 1;
+
                             }
-                            /*telemetry.addData(String.format("height (%d)", i), "%.00f"
-                                    , recognition.getHeight());
-                            telemetry.addData(String.format("width (%d)", i), "%.00f"
-                                    , recognition.getWidth());*/
+
                         }
                     }
                 }
@@ -391,100 +423,84 @@ public class RedSideAutoTest extends LinearOpMode {
             sleep(500);
             j++;
         }
-        return 3;
+        return 1;
     }
 
     private void caseLoc(int loc) {
 
-
-        move(0, 1000, 0, 0.25);
-        move(0, 1000, 0, 0.25);
-
-        sleep(500);
-
-
-        move(0, -1000, 0, 0.25);
-        move(0,-1000,0,0.25);
-        sleep(500);
-
-
-        // 5-10 inch to the bar
-
-        //front whell
-        //move(-600, 0, 0, 0.25);
-
-
-        //back whell
-        //move(-10000, 0, 0, 1);
-
-
-        move(0, 0, 0, 1);
-
-
-        if (loc == 1) {
-            //move(-5,0,0,0.25);
-            slideLow();
-        } else if (loc == 2) {
-            move(-8,0,0,0.25);
-            slideMiddle();
-        } else {
-            slideHigh();
-        }
-
-        // move(-1000, 0, 0, 1);
-        //sleep(500);
-
-
-         /*
-        gyroTurn(90);
-        sleep(1000);
-
-        move(-50, 0, 0, 0.5);
-        sleep(300);
-
-
-        gyroTurn(-90);
-        sleep(1000);
-
-
-        move(0, 0, 50, 0.5);
-        sleep(300);
-
-        gyroTurn(0);
-        sleep(1000);
-
-
-
         clawClose();
-        sleep(300);
-        move(0,150,0,0.5);
-        sleep(300);
+        sleep(500);
+
+        move(0,-750,0,0.5);
+        move(0,0,0,0);
+        gyroTurn(0);
+        move(-2000,0,0,.6);
+        move(-2000,0,0,.6);
+        sleep(500);
+        move(-500,0,0,0.25);
+        sleep(500);
+        gyroTurn(0);
+        move(0,0,0,0);
+        move(0,650,0,0.4);
         slideHigh();
-        sleep(500);
-        move(-50,0,0,0.5);
-        sleep(500);
-        gyroTurn(10);
         sleep(2000);
-        move(0,0,0,0.5);
+        move(-250,0,0,0.25);
         sleep(500);
         clawOpen();
-        sleep(1000);
-        move(15,0,0,0.5);
         sleep(500);
-        move(0,0,0,0.5);
+        move(250,0,0,0.25);
         slideDrop();
+        move(0,0,500,0.3);
         gyroTurn(90);
-        sleep(2000);
-        move(750,0,0,0.5);
         sleep(500);
-        //gyroTurn(90);
+        gyroTurn(90);
         sleep(500);
         move(0,-250,0,0.25);
-        duckSpin();
+        slideLow();
+        move(-1400,0,0,0.4);
+        move(-950,0,0,0.4);
+        sleep(2000);
+        clawClose();
+        sleep(200);
+        slideMid();
         sleep(500);
-        move(0,250,0,0.25);*/
-    }
+        move(0,250,0,0.25);
+        sleep(200);
+        gyroTurn(90);
+        sleep(500);
+        move(1400,0,0,0.5);
+        move(700,0,0,0.5);
+        sleep(500);
+        move(0,0,-500,0.3);
+        sleep(200);
+        gyroTurn(0);
+        slideHigh();
+        sleep(200);
+        move(-150,0,0,0.5);
+        sleep(200);
+        clawOpen();
+        sleep(200);
+        move(150,0,0,0.5);
+        sleep(200);
+        slideDrop();
+        sleep(200);
 
+        if(loc == 3){
+            move(0,950,0,0.5);
+            move(0,0,0,0);
+        }
+
+        else if(loc == 2){
+            move(0,350,0,0.5);
+            move(0,0,0,0);
+        }
+
+        else if(loc == 1){
+            move(0,-350,0,0.5);
+            move(0,0,0,0);
+        }
+
+    }
 
 
     /**
@@ -546,13 +562,17 @@ public class RedSideAutoTest extends LinearOpMode {
      */
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.3f;
         tfodParameters.isModelTensorFlow2 = true;
-        tfodParameters.inputSize = 320;
+        tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+
+        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
+        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+        tfod.loadModelFromFile(TFOD_MODEL_ASSET, LABELS);
+        //tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 
     private float getHeading() {
@@ -589,7 +609,7 @@ public class RedSideAutoTest extends LinearOpMode {
         telemetry.addData("delta : ", delta);
 
         int i = 0;
-        int iMAX = 3000;
+        int iMAX = 100;
 
         while (i < iMAX && opModeIsActive() && delta > 0.4) {
 
@@ -630,6 +650,3 @@ public class RedSideAutoTest extends LinearOpMode {
 
     }
 }
-
-
-
