@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,6 +38,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import android.os.Environment;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -76,15 +79,17 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "BlueSideAutoLeft", group = "Opmode RamEaters")
+@Autonomous(name = "AutoLeft", group = "Opmode RamEaters")
 //@Disabled
-public class BlueSideAutoLeft extends LinearOpMode {
-    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_DM.tflite";
+public class AutoLeft extends LinearOpMode {
+    
+    private static final String TFOD_MODEL_ASSET = String.format("%s/FIRST/tflitemodels/stationary.tflite", Environment.getExternalStorageDirectory().getAbsolutePath());
+
+
     private static final String[] LABELS = {
-            "Ball",
-            "Cube",
-            "Duck",
-            "Marker"
+            "1",
+            "2",
+            "3"
     };
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -102,14 +107,20 @@ public class BlueSideAutoLeft extends LinearOpMode {
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
     private static final double TURN_P = 0.05;
     String test = "";
+    
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
     private DcMotor rightWheelF = null;              //Right Wheel Front
     private DcMotor rightWheelR = null;
+    
+    private DcMotor slideMotor = null;
+    
     private Servo clawLeft = null;
     private Servo clawRight = null;
-    private DcMotor duckWheel = null;
-    private DcMotor returnMotor = null;
+    
+    private ColorSensor color;
+    
+    private int stopThreadRunning = 0;
     //private Robot_OmniDrive robot = new Robot_OmniDrive();
     private final ElapsedTime runtime = new ElapsedTime();
     private BNO055IMU imu;
@@ -133,22 +144,28 @@ public class BlueSideAutoLeft extends LinearOpMode {
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
+        leftWheelF = hardwareMap.get(DcMotor.class, "D1");
+        rightWheelF = hardwareMap.get(DcMotor.class, "D2");
+        leftWheelR = hardwareMap.get(DcMotor.class, "D3");
+        rightWheelR = hardwareMap.get(DcMotor.class, "D4");
+        color = hardwareMap.get(ColorSensor.class, "color");
+        slideMotor = hardwareMap.get(DcMotor.class, "slide");
+        clawLeft = hardwareMap.get(Servo.class, "clawLeft");
+        clawRight = hardwareMap.get(Servo.class, "clawRight");
 
+        
+        leftWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftWheelF = hardwareMap.dcMotor.get("D1");
-        rightWheelF = hardwareMap.dcMotor.get("D2");
-        leftWheelR = hardwareMap.dcMotor.get("D3");
-        rightWheelR = hardwareMap.dcMotor.get("D4");
-        //color = myOpMode.hardwareMap.get(ColorSensor.class, "Color");
-
-        clawLeft = hardwareMap.get(Servo.class, "CL");
-        clawRight = hardwareMap.get(Servo.class, "CR");
-        duckWheel = hardwareMap.get(DcMotor.class, "duck");
-        returnMotor = hardwareMap.get(DcMotor.class, "return");
-
-
-        returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        leftWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
+        slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         /**
          * Activate TensorFlow Object Detection before we wait for the start command.
@@ -167,8 +184,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
             //tfod.setZoom(3.5, 1.78);
             //Sets the number of pixels to obscure on the left, top, right, and bottom edges of each image passed to the TensorFlow object detector. The size of the images are not changed, but the pixels in the margins are colored black.
-            tfod.setClippingMargins(120,160,120,160);
-            tfod.setZoom(1.7, 2.5);
+            tfod.setZoom(2, 1280.0/852);
         }
 
         /** Wait for the game to begin */
@@ -184,18 +200,19 @@ public class BlueSideAutoLeft extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            int r1 = detectDuck();
+            int r1 = detectCone();
             telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
                     r1);
             telemetry.update();
-            //sleep(1000);
+            sleep(1000);
             imuInit();
-
 
             //hardcode for testing
             //caseLoc(3);
 
             caseLoc(r1);
+
+
 
         }
 
@@ -221,20 +238,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
         powerRightF = drive - strafe - rotate;
         powerRightR = drive + strafe - rotate;
 
-        telemetry.addData("LeftWheelF 0=%d", leftWheelF.getCurrentPosition());
-
-
-        leftWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        leftWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
+                                
         leftWheelF.setTargetPosition(leftWheelF.getCurrentPosition() + (int) (-powerLeftF));
         leftWheelR.setTargetPosition(leftWheelR.getCurrentPosition() + (int) (-powerLeftR));
 
@@ -250,19 +254,17 @@ public class BlueSideAutoLeft extends LinearOpMode {
         leftWheelR.setPower(power);
         rightWheelF.setPower(power);
         rightWheelR.setPower(power);
-
-        telemetry.addData("LeftWheelF 1=%d", leftWheelF.getCurrentPosition());
-        telemetry.update();
-
-
+        
+        
         sleep(500);
 
         leftWheelF.setPower(0);
         leftWheelR.setPower(0);
         rightWheelF.setPower(0);
         rightWheelR.setPower(0);
-    }
 
+    }
+    /*
     private void slideHigh() {
         //drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
         //strafe = gamepad1.left_stick_x;
@@ -278,7 +280,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 500);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 400);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -288,7 +290,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
         //strafe = gamepad1.left_stick_x;
         //rotate = gamepad1.right_stick_x;
         returnMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 300);
+        returnMotor.setTargetPosition(returnMotor.getCurrentPosition() + 200);
         returnMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         returnMotor.setPower(1);
     }
@@ -300,35 +302,75 @@ public class BlueSideAutoLeft extends LinearOpMode {
 
         returnMotor.setPower(0);
     }
+    */
+    
+    private void slideHigh() {
+        int target = 3550;
+        int max = 3550;
 
-    private void duckSpin() {
-        duckWheel.setPower(0.75);
-        sleep(2000);
-        duckWheel.setPower(0);
-        sleep(200);
+        if (target >= max) {
+            target = max;
+        }
+        slideMotor.setTargetPosition(target);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+        
     }
 
-    private void clawClose() {
+    private void slideMid() {
+        
+        int target = 2700;
+
+        int max = 2700;
+
+        if (target >= max) {
+            target = max;
+        }
+
+        slideMotor.setTargetPosition(target);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+    }
+
+    private void slideLow() {
+        int target = 750;
+        int max = 750;
+
+        if (target >= max) {
+            target = max;
+        }
+        slideMotor.setTargetPosition(target);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+    }
+    
+    private void clawOpen() {
         //clawLeft.setPosition(0.5);
         //clawRight.setPosition(0.5);
         //close
         clawLeft.setPosition(0.09);
-        clawRight.setPosition(0.37);
+        clawRight.setPosition(0.41);
     }
 
-    private void clawOpen() {
+    private void clawClose() {
         //clawLeft.setPosition(0);
         //clawRight.setPosition(1);
         //open
         clawLeft.setPosition(0);
         clawRight.setPosition(0.50);
     }
+    
+    private void slideDrop() {
+        slideMotor.setTargetPosition(0);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+    }
 
-    private int detectDuck() {
+    private int detectCone() {
 
         int iTimeOut = 5;
         int j = 0;
-
+        Integer detect = 1;
         while (opModeIsActive() && j < iTimeOut) {
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
@@ -340,128 +382,112 @@ public class BlueSideAutoLeft extends LinearOpMode {
                     // step through the list of recognitions and display boundary info.
                     int i = 0;
                     for (Recognition recognition : updatedRecognitions) {
-                        if (recognition.getWidth() < 100 && recognition.getHeight() < 100
-                                && (0.75 < recognition.getWidth() / recognition.getHeight() || recognition.getWidth() / recognition.getHeight() < 1.25)) {
+                    
+                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                        telemetry.update();
+                        detect = Integer.parseInt(recognition.getLabel());
 
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  right (%d)", i), "%.03f"
-                                    , recognition.getRight() * 1000);
-
-                            // Robot is place on Left side
-                            int pos1_left = 350000;
-                            int pos2_left = 150000;
-
-                            if (recognition.getRight() * 1000 >= pos1_left) {
-
-                                telemetry.addData("Left pos", 3);
-                                //r_pos = 3;
-                                //high
-                                return 3;
-
-                            } else if (recognition.getRight() * 1000 >= pos2_left) {
-
-                                telemetry.addData("Left pos", 2);
-                                //r_pos = 2;
-                                //mid
-                                return 2;
-
-                            } else {
-
-                                telemetry.addData("Left pos", 1);
-                                //r_pos = 1;
-                                //low
-                                return 1;
-
-                            }
-
-                        }
-                    }
+                    }   
                 }
             }
-            sleep(500);
+            sleep(200);
             j++;
         }
-        return 1;
+        return detect;
     }
 
     private void caseLoc(int loc) {
-
-        /*move(0, 50, 0, 0.5);
-        sleep(300);
-
-        gyroTurn(90);
-        sleep(1000);
-
-        move(-50, 0, 0, 0.5);
-        sleep(300);
-
-
-        gyroTurn(-90);
-        sleep(1000);
-
-
-        move(0, 0, 50, 0.5);
-        sleep(300);
-
-        gyroTurn(0);
-        sleep(1000);*/
+        
         clawClose();
-        sleep(300);
-        //gyroTurn(0);
-        //sleep(300);
-        move(0,-250,0,0.2);
-        move(0,-150,0,0.2);
+        sleep(200);
+        
+        move(0,-1250,0,0.5);
+        move(0,0,0,0);
+        gyroTurn(0);
         sleep(100);
         gyroTurn(0);
-
-        //sleep(1450);
-        if (loc == 1) {
-            move(-5,0,0,0.25);
-            slideLow();
-        } else if (loc == 2) {
-            move(-10,0,0,0.25);
-            slideMiddle();
-        } else {
-            move(-5,0,0,0.25);
-            slideHigh();
-        }
-        move(-175,0,0,0.2);
+        sleep(100);
+        move(-2000,0,0,.5);
+        move(-2000,0,0,.5);
+        sleep(200);
+        move(-650,0,0,0.4);
+        sleep(500);
+        gyroTurn(0);
+        sleep(1000);
+        gyroTurn(0);
+        sleep(1000);
+        move(0,0,0,0);
+        move(0,650,0,0.4);
+        slideHigh();
+        sleep(1000);
+        move(-300,0,0,0.25);
+        sleep(500);
+        clawOpen();
+        sleep(200);
+        move(250,0,0,0.25);
+        slideDrop();
         sleep(200);
         gyroTurn(0);
-        sleep(100);
+        sleep(200);
+        gyroTurn(0);
+        sleep(200);
+        /*move(0,0,-500,0.3);
+        gyroTurn(-90);
+        sleep(200);
+        gyroTurn(-90);
+        sleep(200);
+        move(0,250,0,0.25);
+        slideLow();
+        move(-1400,0,0,0.4);
+        move(-950,0,0,0.4);
+        sleep(2000);
+        clawClose();
+        sleep(200);
+        slideMid();
+        sleep(200);
+        move(0,-250,0,0.25);
+        sleep(200);
+        gyroTurn(-90);
+        sleep(200);
+        gyroTurn(-90);
+        sleep(200);
+        move(1400,0,0,0.5);
+        move(700,0,0,0.5);
+        sleep(200);
+        move(0,0,500,0.3);
+        sleep(200);
+        gyroTurn(0);
+        sleep(200);
+        gyroTurn(0);
+        sleep(200);
+        slideHigh();
+        sleep(200);
+        move(-150,0,0,0.5);
+        sleep(200);
         clawOpen();
-        sleep(100);
-        move(15,0,0,0.5);
-
-        if (loc == 2) {
-            move(10,0,0,0.25);
-        } else if (loc == 1) {
-            move(5,0,0,0.25);
-        } else {
-            move(5,0,0,0.25);
-        }
-        sleep(500);
-        move(0,0,0,0);
+        sleep(200);
+        move(150,0,0,0.5);
+        sleep(200);
         slideDrop();
-        move(0,0,75,0.5);
-        sleep(500);
-        gyroTurn(90);
-        move(0,0,0,0);
-        //sleep(1000);
-        slideMiddle();
-        sleep(500);
-        move(-100,0,0,0.25);
-        sleep(100);
-        gyroTurn(90);
-        //sleep(500);
-        sleep(100);
-        gyroTurn(90);
-        move(-750, 0, 0, 0.25);
-        //back whell
-        move(-1500, 0, 0, 1);
-        move(-500,0,0,1);
-
-        sleep(1500);
+        sleep(200);*/
+        
+        if(loc == 3){
+            move(0,2000,0,0.8);
+            sleep(2000);
+            move(0,2000,0,0.55);
+            sleep(2000);
+            move(0,0,0,0);
+        }
+        
+        else if(loc == 2){
+            move(0,350,0,0.5);
+            move(0,0,0,0);
+        }
+        
+        else {
+            move(0,-500,0,0.5);
+            move(0,0,0,0);
+        }
 
     }
 
@@ -525,15 +551,19 @@ public class BlueSideAutoLeft extends LinearOpMode {
      */
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.50f;
+        tfodParameters.minResultConfidence = 0.3f;
         tfodParameters.isModelTensorFlow2 = true;
-        tfodParameters.inputSize = 320;
+        tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-    }
 
+        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
+        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+        tfod.loadModelFromFile(TFOD_MODEL_ASSET, LABELS);
+        //tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+    }
+    
     private float getHeading() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
         //return 0;
@@ -575,7 +605,7 @@ public class BlueSideAutoLeft extends LinearOpMode {
             double error_degrees = (target_angle - currentHeading) % 360; //Compute Error
             //telemetry.addData("target_angle : ",target_angle);
             //telemetry.addData("heading : ",getHeading());
-            double motor_output = Range.clip(error_degrees * TURN_P, -.6, .6);
+            double motor_output = Range.clip(error_degrees * TURN_P, -.5, .5);
             //double test = (0 - getHeading()) % 360;//Get Correction
             //telemetry.addData("test : ",test);
             // Send corresponding powers to the motors\

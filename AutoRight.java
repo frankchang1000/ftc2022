@@ -79,10 +79,10 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "BlueSideRight", group = "Opmode RamEaters")
+@Autonomous(name = "AutoRight", group = "Opmode RamEaters")
 //@Disabled
-public class BlueSideRight extends LinearOpMode {
-
+public class AutoRight extends LinearOpMode {
+    
     private static final String TFOD_MODEL_ASSET = String.format("%s/FIRST/tflitemodels/stationary.tflite", Environment.getExternalStorageDirectory().getAbsolutePath());
 
 
@@ -107,19 +107,19 @@ public class BlueSideRight extends LinearOpMode {
             "AXiCpJb/////AAABmUeqLpvfjkywirbDoSbnyFYKMf7uB24PIfaJZtIqcZO3L7rZVbsKVlz/fovHxEI6VgkUt3PBpXnp+YmHyLrWimMt2AKMFMYsYeZNRmz0p8jFT8DfQC7mmUgswQuPIm64qc8rxwV7vSb0et6Za96tPoDHYNHzhdiaxbI0UHpe4jCkqNTiRDFz8EVNds9kO7bCIXzxBfYfgTDdtjC5JRJ/drtM6DZnTXOqz3pdM85JEVgQqL9wBxUePSjbzyMo9e/FgxluCuWtxHraRJeeuvAlFwAb8wVAoV1cm02qIew0Vh0pDVJqy04gu62CJPhv/wwnXCKywUIEzVMbOLe7muycyHoT6ltpAn4O4s4Z82liWs9x";
     private static final double TURN_P = 0.05;
     String test = "";
-
+    
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
     private DcMotor rightWheelF = null;              //Right Wheel Front
     private DcMotor rightWheelR = null;
-
+    
     private DcMotor slideMotor = null;
-
+    
     private Servo clawLeft = null;
     private Servo clawRight = null;
-
+    
     private ColorSensor color;
-
+    
     private int stopThreadRunning = 0;
     //private Robot_OmniDrive robot = new Robot_OmniDrive();
     private final ElapsedTime runtime = new ElapsedTime();
@@ -153,7 +153,7 @@ public class BlueSideRight extends LinearOpMode {
         clawLeft = hardwareMap.get(Servo.class, "clawLeft");
         clawRight = hardwareMap.get(Servo.class, "clawRight");
 
-
+        
         leftWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftWheelR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightWheelF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -163,7 +163,7 @@ public class BlueSideRight extends LinearOpMode {
         leftWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightWheelF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightWheelR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        
         slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -200,17 +200,17 @@ public class BlueSideRight extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            //int r1 = detectCone();
-            //telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
-            //        r1);
-            //telemetry.update();
-            //sleep(1000);
+            int r1 = detectCone();
+            telemetry.addData(String.format("  r1 (%d)", 99999), "%d ",
+                    r1);
+            telemetry.update();
+            sleep(1000);
             imuInit();
 
             //hardcode for testing
             //caseLoc(3);
 
-            caseLoc(1);
+            caseLoc(r1);
 
 
 
@@ -238,7 +238,7 @@ public class BlueSideRight extends LinearOpMode {
         powerRightF = drive - strafe - rotate;
         powerRightR = drive + strafe - rotate;
 
-
+                                
         leftWheelF.setTargetPosition(leftWheelF.getCurrentPosition() + (int) (-powerLeftF));
         leftWheelR.setTargetPosition(leftWheelR.getCurrentPosition() + (int) (-powerLeftR));
 
@@ -254,8 +254,8 @@ public class BlueSideRight extends LinearOpMode {
         leftWheelR.setPower(power);
         rightWheelF.setPower(power);
         rightWheelR.setPower(power);
-
-
+        
+        
         sleep(500);
 
         leftWheelF.setPower(0);
@@ -303,10 +303,10 @@ public class BlueSideRight extends LinearOpMode {
         returnMotor.setPower(0);
     }
     */
-
+    
     private void slideHigh() {
-        int target = 3500;
-        int max = 3500;
+        int target = 3550;
+        int max = 3550;
 
         if (target >= max) {
             target = max;
@@ -314,11 +314,11 @@ public class BlueSideRight extends LinearOpMode {
         slideMotor.setTargetPosition(target);
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slideMotor.setPower(1);
-
+        
     }
 
     private void slideMid() {
-
+        
         int target = 2700;
 
         int max = 2700;
@@ -343,7 +343,7 @@ public class BlueSideRight extends LinearOpMode {
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slideMotor.setPower(1);
     }
-
+    
     private void clawOpen() {
         //clawLeft.setPosition(0.5);
         //clawRight.setPosition(0.5);
@@ -359,7 +359,7 @@ public class BlueSideRight extends LinearOpMode {
         clawLeft.setPosition(0);
         clawRight.setPosition(0.50);
     }
-
+    
     private void slideDrop() {
         slideMotor.setTargetPosition(0);
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -370,7 +370,7 @@ public class BlueSideRight extends LinearOpMode {
 
         int iTimeOut = 5;
         int j = 0;
-
+        Integer detect = 1;
         while (opModeIsActive() && j < iTimeOut) {
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
@@ -382,79 +382,60 @@ public class BlueSideRight extends LinearOpMode {
                     // step through the list of recognitions and display boundary info.
                     int i = 0;
                     for (Recognition recognition : updatedRecognitions) {
-                        if (recognition.getWidth() < 100 && recognition.getHeight() < 100
-                                && (0.75 < recognition.getWidth() / recognition.getHeight() || recognition.getWidth() / recognition.getHeight() < 1.25)) {
+                    
+                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                        telemetry.update();
+                        detect = Integer.parseInt(recognition.getLabel());
 
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  right (%d)", i), "%.03f"
-                                    , recognition.getRight() * 1000);
-
-                            // Robot is place on Right side
-                            int pos1_right = 340000;
-                            int pos2_right = 150000;
-
-                            if (recognition.getRight() * 1000 >= pos1_right) {
-
-                                telemetry.addData("Right pos", 3);
-                                //r_pos = 3;
-                                //high
-                                return 3;
-
-                            } else if (recognition.getRight() * 1000 >= pos2_right) {
-
-                                telemetry.addData("Right pos", 2);
-                                //r_pos = 2;
-                                //mid
-                                return 2;
-
-                            } else {
-
-                                telemetry.addData("Right pos", 1);
-                                //r_pos = 1;
-                                //low
-                                return 1;
-
-                            }
-
-                        }
-                    }
+                    }   
                 }
             }
-            sleep(500);
+            sleep(200);
             j++;
         }
-        return 1;
+        return detect;
     }
 
     private void caseLoc(int loc) {
-
+        
         clawClose();
-        sleep(500);
-
-        move(0,750,0,0.5);
+        sleep(200);
+        
+        move(0,1050,0,0.55);
         move(0,0,0,0);
         gyroTurn(0);
-        move(-2000,0,0,.6);
-        move(-2000,0,0,.6);
-        sleep(500);
-        move(-500,0,0,0.25);
+        sleep(100);
+        gyroTurn(0);
+        sleep(100);
+        move(-2000,0,0,.5);
+        move(-2000,0,0,.5);
+        sleep(200);
+        move(-650,0,0,0.38);
         sleep(500);
         gyroTurn(0);
+        sleep(1000);
+        gyroTurn(0);
+        sleep(1000);
         move(0,0,0,0);
-        move(0,-650,0,0.4);
+        move(0,-650,0,0.38);
         slideHigh();
-        sleep(2000);
-        move(-250,0,0,0.25);
+        sleep(1000);
+        move(-300,0,0,0.25);
         sleep(500);
         clawOpen();
-        sleep(500);
+        sleep(200);
         move(250,0,0,0.25);
         slideDrop();
-        move(0,0,-500,0.3);
+        sleep(200);
+        gyroTurn(0);
+        sleep(200);
+        gyroTurn(0);
+        sleep(200);
+        /*move(0,0,-500,0.3);
         gyroTurn(-90);
-        sleep(500);
+        sleep(200);
         gyroTurn(-90);
-        sleep(500);
+        sleep(200);
         move(0,250,0,0.25);
         slideLow();
         move(-1400,0,0,0.4);
@@ -463,17 +444,22 @@ public class BlueSideRight extends LinearOpMode {
         clawClose();
         sleep(200);
         slideMid();
-        sleep(500);
+        sleep(200);
         move(0,-250,0,0.25);
         sleep(200);
         gyroTurn(-90);
-        sleep(500);
+        sleep(200);
+        gyroTurn(-90);
+        sleep(200);
         move(1400,0,0,0.5);
         move(700,0,0,0.5);
-        sleep(500);
+        sleep(200);
         move(0,0,500,0.3);
         sleep(200);
         gyroTurn(0);
+        sleep(200);
+        gyroTurn(0);
+        sleep(200);
         slideHigh();
         sleep(200);
         move(-150,0,0,0.5);
@@ -483,20 +469,23 @@ public class BlueSideRight extends LinearOpMode {
         move(150,0,0,0.5);
         sleep(200);
         slideDrop();
-        sleep(200);
-
+        sleep(200);*/
+        
         if(loc == 3){
-            move(0,-950,0,0.5);
+            move(0,-2000,0,0.8);
+            sleep(2000);
+            move(0,-2000,0,0.55);
+            sleep(2000);
             move(0,0,0,0);
         }
-
+        
         else if(loc == 2){
-            move(0,-350,0,0.5);
+            move(0,-350,0,0.65);
             move(0,0,0,0);
         }
-
-        else if(loc == 1){
-            move(0,350,0,0.5);
+        
+        else {
+            move(0,500,0,0.5);
             move(0,0,0,0);
         }
 
@@ -574,7 +563,7 @@ public class BlueSideRight extends LinearOpMode {
         tfod.loadModelFromFile(TFOD_MODEL_ASSET, LABELS);
         //tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
-
+    
     private float getHeading() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
         //return 0;
@@ -616,7 +605,7 @@ public class BlueSideRight extends LinearOpMode {
             double error_degrees = (target_angle - currentHeading) % 360; //Compute Error
             //telemetry.addData("target_angle : ",target_angle);
             //telemetry.addData("heading : ",getHeading());
-            double motor_output = Range.clip(error_degrees * TURN_P, -.6, .6);
+            double motor_output = Range.clip(error_degrees * TURN_P, -.5, .5);
             //double test = (0 - getHeading()) % 360;//Get Correction
             //telemetry.addData("test : ",test);
             // Send corresponding powers to the motors\
@@ -650,3 +639,6 @@ public class BlueSideRight extends LinearOpMode {
 
     }
 }
+
+
+
