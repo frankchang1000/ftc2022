@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.s2021;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -70,7 +70,10 @@ public class Ftc_code1 extends OpMode {
         // Power for forward and back motion
         double strafe;  // Power for left and right motion
         double rotateLeft;
-        double rotateRight;// Power for rotating the robot
+        double rotateRight;
+        double drive2;
+        double strafe2;
+        // Power for rotating the robot
         //int intake;
         //double linearSlide;
         drive = gamepad1.left_stick_y;  // Negative because the gamepad is weird
@@ -79,6 +82,10 @@ public class Ftc_code1 extends OpMode {
         rotateRight = gamepad1.left_trigger;
         //linearSlide = gamepad2.left_stick_y;
         //intake = gamepad2.left_trigger;
+        
+        drive2 = gamepad1.right_stick_y;
+        strafe2 = gamepad1.right_stick_x;
+        
 
         double powerLeftF;
         double powerRightF;
@@ -90,21 +97,40 @@ public class Ftc_code1 extends OpMode {
         //intakeWheel1.setPower(1);
 
         //if full power on left stick
-        powerLeftF = drive - strafe + rotateRight - rotateLeft;
-        powerLeftR = drive + strafe + rotateRight - rotateLeft;
-        //powerIntake = intake;
-        powerRightF = drive + strafe - rotateRight + rotateLeft;
-        powerRightR = drive - strafe - rotateRight + rotateLeft;
-
+        if (drive != 0 || strafe != 0 || rotateRight != 0 || rotateLeft != 0) {
+            powerLeftF = drive - strafe + rotateRight - rotateLeft;
+            powerLeftR = drive + strafe + rotateRight - rotateLeft;
+            //powerIntake = intake;
+            powerRightF = drive + strafe - rotateRight + rotateLeft;
+            powerRightR = drive - strafe - rotateRight + rotateLeft;
+        
         //slidePower = linearSlide;
 
-        //slideMotor.setPower(slidePower);
-        if (stopThreadRunning == 0) {
-            leftWheelF.setPower(-powerLeftF * 0.6);
-            leftWheelR.setPower(-powerLeftR * 0.6);
+            //slideMotor.setPower(slidePower);
+            if (stopThreadRunning == 0) {
+                leftWheelF.setPower(-powerLeftF * 0.8);
+                leftWheelR.setPower(-powerLeftR * 0.8);
+    
+                rightWheelF.setPower(powerRightF * 0.8);
+                rightWheelR.setPower(powerRightR * 0.8);
+            }
+        }
+        
+        else {
+                // else half power
+            powerLeftF = drive2 - strafe2 + rotateRight / 2 - rotateLeft / 2;
+            powerLeftR = drive2 + strafe2 + rotateRight / 2 - rotateLeft / 2;
 
-            rightWheelF.setPower(powerRightF * 0.6);
-            rightWheelR.setPower(powerRightR * 0.6);
+            powerRightF = drive2 + strafe2 - rotateRight / 2 + rotateLeft / 2;
+            powerRightR = drive2 - strafe2 - rotateRight / 2 + rotateLeft / 2;
+
+            if (stopThreadRunning == 0) {
+                leftWheelF.setPower(-powerLeftF * 0.3);
+                leftWheelR.setPower(-powerLeftR * 0.3);
+
+                rightWheelF.setPower(powerRightF * 0.3);
+                rightWheelR.setPower(powerRightR * 0.3);
+            }
         }
         /*
         //intakeWheel1.setPower(powerIntake);
