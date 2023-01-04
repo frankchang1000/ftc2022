@@ -20,8 +20,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
-@Autonomous(name = "TestAuto", group = "Opmode RamEaters")
-public class TestAuto extends LinearOpMode {
+@Autonomous(name = "AutoR", group = "Opmode RamEaters")
+public class AutoR extends LinearOpMode {
        
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
@@ -188,7 +188,7 @@ public class TestAuto extends LinearOpMode {
             caseLoc(r1);
 
             
-            sleep(15000);
+            //sleep(15000);
         }
         
         if (tfod != null) {
@@ -316,53 +316,77 @@ public class TestAuto extends LinearOpMode {
         
         gyroTurn(0);
         
-        clawOpen();
-        telemetry.addData("test ", "%s", "clawOpen");
-
-        sleep(500);
-        
         clawClose();
-        telemetry.addData("test ", "%s", "clawClose");
+        
+        sleep(300);
+        
+        slideLow();
+        
+        sleep(200);
+        
+        move(0,1080,0,0.3,1000);
 
-        sleep(500);
+        gyroTurn(3);
+        
+        move(-2300,20,0,0.2,1750);
+        
+        gyroTurn(3);
+
+        move(-2320,20,0,0.2,1800);
+        
+        gyroTurn(-1);
+
+        move(0,-720,0,0.3,680);
+        
+        gyroTurn(0);
         
         slideHigh();
-        telemetry.addData("test ", "%s", "slideHigh");
-        sleep(1000);
+        
+        sleep(1500);
+        
+        move(-250,0,0,0.25,500);
+        
+        gyroTurn(0);
         
         clawOpen();
-        telemetry.addData("test ", "%s", "clawOpen");
-        sleep(500);
+        
+        sleep(200);
+        
+        move(300,0,0,0.25,500);
         
         slideDrop();
-        telemetry.addData("test ", "%s", "slideDrop");
-        sleep(2000);
         
-        move(-500,0,0,0.5,500);
-        telemetry.addData("test ", "move (%s)", "-500,0,0,0.5,500");
+        sleep(1000);
         
-        move(500,0,0,0.5,500);
-        telemetry.addData("test ", "move (%s)", "500,0,0,0.5,500");
-
-        move(0,-500,0,0.5,500);
-        telemetry.addData("test ", "move (%s)", "0,-500,0,0.5,500");
-
-        move(0,500,0,0.5,500);
-        telemetry.addData("test ", "move (%s)", "0,500,0,0.5,500");
-
-        // call twice
-        gyroTurn(0);
-        gyroTurn(0);
-   
-        gyroTurn(90);
-
-        move(0,0,300,0.5,500);
-        telemetry.addData("test ", "move (%s)", "0,0,300,0.5,500");
         
-        // call twice
-        gyroTurn(0);
-        gyroTurn(0);
-    
+        
+         
+        if(loc == 3){
+            
+            move(-100,0,0,0.3,500);
+            
+            gyroTurn(2);
+            
+            move(0,-2000,0,0.5,2500);
+        }
+        
+        else if(loc == 2){
+            gyroTurn(3);
+            move(0,-650,0,0.5,1000);
+
+        }
+        
+        else {
+            gyroTurn(3);
+            move(0,500,0,0.5,500);
+
+        }
+        
+        
+        clawOpen();
+        sleep(500);
+        slideDrop();
+        sleep(1500);
         telemetry.update();
         
     }
@@ -400,7 +424,7 @@ public class TestAuto extends LinearOpMode {
         double delta = Math.abs((currentHeading - target_angle));
         
         int i = 0;
-        int iMAX = 800;
+        int iMAX = 400;
 
         while (i < iMAX && opModeIsActive() && delta > 0.01) 
         {
