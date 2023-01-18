@@ -20,8 +20,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
-@Autonomous(name = "TestAuto", group = "Opmode RamEaters")
-public class TestAuto extends LinearOpMode {
+@Autonomous(name = "AutoRightDouble", group = "Opmode RamEaters")
+public class AutoRightDouble extends LinearOpMode {
 
     private DcMotor leftWheelF = null;               //Left Wheel Front
     private DcMotor leftWheelR = null;               //Left Wheel Back
@@ -173,7 +173,6 @@ public class TestAuto extends LinearOpMode {
             tfod.setClippingMargins(250,150,250,150);
         }
 
-        //sleep(1000);
 
         imuInit();
 
@@ -188,7 +187,7 @@ public class TestAuto extends LinearOpMode {
             caseLoc(r1);
 
 
-            sleep(15000);
+            //sleep(15000);
         }
 
         if (tfod != null) {
@@ -266,9 +265,9 @@ public class TestAuto extends LinearOpMode {
 
     private void slideMid() {
 
-        int target = 2700;
+        int target = 2600;
 
-        int max = 2700;
+        int max = 2600;
 
         if (target >= max) {
             target = max;
@@ -280,8 +279,8 @@ public class TestAuto extends LinearOpMode {
     }
 
     private void slideLow() {
-        int target = 750;
-        int max = 750;
+        int target = 1500;
+        int max = 1500;
 
         if (target >= max) {
             target = max;
@@ -310,82 +309,130 @@ public class TestAuto extends LinearOpMode {
         slideMotor.setPower(1);
     }
 
+    private void slideN(int n) {
+        int target = (n-1)*150;
+
+        slideMotor.setTargetPosition(target);
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+    }
+
 
 
     private void caseLoc(int loc) {
 
+        // 1st cone
         gyroTurn(0);
 
-        clawOpen();
-        telemetry.addData("test ", "%s", "clawOpen");
-
-        sleep(500);
-
         clawClose();
-        telemetry.addData("test ", "%s", "clawClose");
 
         sleep(500);
 
         slideLow();
-        telemetry.addData("test ", "%s", "slideHigh");
-        sleep(1000);
 
-        clawOpen();
-        telemetry.addData("test ", "%s", "clawOpen");
-        sleep(500);
+        sleep(50);
 
-        slideDrop();
-        telemetry.addData("test ", "%s", "slideDrop");
-        sleep(2000);
+        move(-300,0,0,0.3,300);
 
-        move(-500,0,0,0.5,500);
-        telemetry.addData("test ", "move (%s)", "-500,0,0,0.5,500");
+        move(0,550,0,0.3,550);
 
-        move(500,0,0,0.5,500);
-        telemetry.addData("test ", "move (%s)", "500,0,0,0.5,500");
-
-        move(0,-500,0,0.5,500);
-        telemetry.addData("test ", "move (%s)", "0,-500,0,0.5,500");
-
-        move(0,500,0,0.5,500);
-        telemetry.addData("test ", "move (%s)", "0,500,0,0.5,500");
-
-        // call twice
         gyroTurn(0);
 
-        move(-100,0,0,0.3,500);
+        move(-150,0,0,0.3,350);
+
+        clawOpen();
+
+        sleep(500);
+
+        // 2nd cone
+
+        move(300,0,0,0.3,300);
+
+        move(0,-850,0,0.3,850);
+
+        gyroTurn(5);
+
+        move(-1500,0,0,0.3,1500);
+
+        move(-1000,0,0,0.3,1000);
 
         gyroTurn(-90);
 
-        move(-100,0,0,0.3,500);
+        slideN(5);
 
-        gyroTurn(-180);
+        sleep(200);
 
-        sleep(1000);
+        move(-1050,0,0,0.35,1050);
 
-        move(0,50,0,0.5,500);
-
-        justTurn(-90);
-
-        move(0,-50,0,0.5,500);
+        move(0,0,0,1,10);
 
         clawClose();
 
+        sleep(300);
+
+        slideLow();
+
+        sleep(200);
+
+        move(600,0,0,0.3,500);
+
         gyroTurn(-180);
 
-        move(0,50,0,0.5,500);
+        move(-300,0,0,0.3,300);
 
         clawOpen();
 
+        sleep(200);
+
+
+        //
+
+        move(300,0,0,0.3,300);
+
         justTurn(-90);
 
-        //move(0,0,300,0.5,500);
-        //telemetry.addData("test ", "move (%s)", "0,0,300,0.5,500");
+        slideN(4);
 
-        // call twice
-        //gyroTurn(0);
+        sleep(200);
+
+        gyroTurn(-90);
+
+        move(-1050,0,0,0.3,1050);
+
+        move(0,0,0,1,10);
+
+        clawClose();
+
+        sleep(300);
+
+        /*
+        if(loc == 3){
+
+            move(-100,0,0,0.3,500);
+
+            gyroTurn(2);
+
+            move(0,-2000,0,0.5,2500);
+        }
+
+        else if(loc == 2){
+            gyroTurn(3);
+            move(0,-650,0,0.5,1000);
+
+        }
+
+        else {
+            gyroTurn(3);
+            move(0,500,0,0.5,500);
+
+        }
+        */
 
 
+        clawOpen();
+        sleep(500);
+        slideDrop();
+        sleep(1500);
         telemetry.update();
 
     }
@@ -409,6 +456,7 @@ public class TestAuto extends LinearOpMode {
         imu.initialize(parameters);
 
     }
+
 
     private void justTurn(double deg) {
 
@@ -446,14 +494,12 @@ public class TestAuto extends LinearOpMode {
     }
 
 
-
     private void gyroTurn(double target_angle) {
 
         leftWheelF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftWheelR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightWheelF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightWheelR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
 
         double currentHeading = getHeading();
 
@@ -465,7 +511,7 @@ public class TestAuto extends LinearOpMode {
         while (i < iMAX && opModeIsActive() && delta > 0.01)
         {
 
-            double error_degrees = (target_angle - currentHeading) % 360.0;
+            double error_degrees = (target_angle - currentHeading) % 360;
 
             double motor_output = Range.clip(error_degrees * TURN_P, -0.6, 0.6);
 
@@ -482,7 +528,7 @@ public class TestAuto extends LinearOpMode {
             telemetry.addData("motor_output : ", motor_output);
             telemetry.addData("target_angle : ", target_angle);
             telemetry.addData("currentHeading : ", currentHeading);
-            delta = Math.abs((currentHeading- target_angle));
+            delta = Math.abs((currentHeading - target_angle));
             telemetry.addData("delta : ", delta);
 
             i++;
@@ -491,7 +537,7 @@ public class TestAuto extends LinearOpMode {
 
         }
 
-        //sleep(500);
+        //sleep(1000);
 
         leftWheelF.setPower(0);
         leftWheelR.setPower(0);
