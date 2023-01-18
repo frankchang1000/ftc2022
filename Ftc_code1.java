@@ -22,10 +22,10 @@ public class Ftc_code1 extends OpMode {
     private int random = 10;
     private int count = 0;
     private DcMotor slideMotor = null;
-    
+
     private Servo clawLeft = null;
     private Servo clawRight = null;
-    
+
     private ColorSensor color;
     private int stopThreadRunning = 0;
 
@@ -43,11 +43,11 @@ public class Ftc_code1 extends OpMode {
         slideMotor = hardwareMap.get(DcMotor.class, "slide");
         clawLeft = hardwareMap.get(Servo.class, "clawLeft");
         clawRight = hardwareMap.get(Servo.class, "clawRight");
-        
+
         slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        
+
         slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -82,10 +82,10 @@ public class Ftc_code1 extends OpMode {
         rotateRight = gamepad1.left_trigger;
         //linearSlide = gamepad2.left_stick_y;
         //intake = gamepad2.left_trigger;
-        
+
         drive2 = gamepad1.right_stick_y;
         strafe2 = gamepad1.right_stick_x;
-        
+
 
         double powerLeftF;
         double powerRightF;
@@ -98,24 +98,24 @@ public class Ftc_code1 extends OpMode {
 
         //if full power on left stick
         if (drive != 0 || strafe != 0 || rotateRight != 0 || rotateLeft != 0) {
-            powerLeftF = drive - strafe + rotateRight - rotateLeft;
-            powerLeftR = drive + strafe + rotateRight - rotateLeft;
+            powerLeftF = drive - strafe + rotateRight *0.85 - rotateLeft*0.85;
+            powerLeftR = drive + strafe + rotateRight*0.85 - rotateLeft*0.85;
             //powerIntake = intake;
-            powerRightF = drive + strafe - rotateRight + rotateLeft;
-            powerRightR = drive - strafe - rotateRight + rotateLeft;
-        
+            powerRightF = drive + strafe - rotateRight*0.85 + rotateLeft*0.85;
+            powerRightR = drive - strafe - rotateRight*0.85 + rotateLeft*0.85;
+
         //slidePower = linearSlide;
 
             //slideMotor.setPower(slidePower);
             if (stopThreadRunning == 0) {
                 leftWheelF.setPower(-powerLeftF * 0.8);
                 leftWheelR.setPower(-powerLeftR * 0.8);
-    
+
                 rightWheelF.setPower(powerRightF * 0.8);
                 rightWheelR.setPower(powerRightR * 0.8);
             }
         }
-        
+
         else {
                 // else half power
             powerLeftF = drive2 - strafe2 + rotateRight / 2 - rotateLeft / 2;
@@ -141,7 +141,7 @@ public class Ftc_code1 extends OpMode {
             }
         }
         */
-        
+
         if (gamepad2.right_bumper) {
             //open
             clawLeft.setPosition(0);
@@ -151,7 +151,7 @@ public class Ftc_code1 extends OpMode {
             clawLeft.setPosition(0.15);
             clawRight.setPosition(0.35);
         }
-        
+
         if (gamepad2.y) {
             slideHigh();
         }
@@ -174,9 +174,9 @@ public class Ftc_code1 extends OpMode {
             resetSlide();
         }
     }
-    
+
     private void slideHigh() {
-        
+
         //slideMotor.setDirection(DcMotor.Direction.FORWARD);
         //slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         if (random % 2 == 0) {
@@ -196,7 +196,7 @@ public class Ftc_code1 extends OpMode {
     }
 
     private void slideMid() {
-        
+
         //slideMotor.setDirection(DcMotor.Direction.FORWARD);
         //slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         if (random % 2 == 0) {
@@ -236,8 +236,8 @@ public class Ftc_code1 extends OpMode {
         slideMotor.setTargetPosition(target);
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slideMotor.setPower(1);
-        
-        
+
+
     }
 
     private void slideSubtract(int sub) {
@@ -248,7 +248,7 @@ public class Ftc_code1 extends OpMode {
         } else {
             slideMotor.setDirection(DcMotor.Direction.FORWARD);
         }
-        
+
         //slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         int target = slideMotor.getCurrentPosition() + sub;
 
@@ -256,7 +256,7 @@ public class Ftc_code1 extends OpMode {
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slideMotor.setPower(0.5);
     }
-    
+
     private void slideAdd(int add) {
 
         //slideMotor.setDirection(DcMotor.Direction.FORWARD);
@@ -265,10 +265,10 @@ public class Ftc_code1 extends OpMode {
         } else {
             slideMotor.setDirection(DcMotor.Direction.REVERSE);
         }
-        
+
         //slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         int target = slideMotor.getCurrentPosition() + add;
-        
+
         if (target >= 3700) {
             target = 3700;
         }
@@ -276,8 +276,8 @@ public class Ftc_code1 extends OpMode {
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slideMotor.setPower(0.5);
     }
-    
-    
+
+
     private void slideDrop() {
         //slideMotor.setDirection(DcMotor.Direction.REVERSE);
         //slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -299,7 +299,7 @@ public class Ftc_code1 extends OpMode {
         slideMotor.setPower(1);
         random++;
     }
-    
+
     private void resetSlide() {
         //slideMotor.setDirection(DcMotor.Direction.REVERSE);
         //slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -312,12 +312,12 @@ public class Ftc_code1 extends OpMode {
         //telemetry.addData("count", "%d", count);
         //telemetry.update();
         slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        
+
     }
-    
-    
+
+
     public Boolean poleDetect() {
-        if (color.green() > color.red() && color.green() > color.blue()) { 
+        if (color.green() > color.red() && color.green() > color.blue()) {
             telemetry.addLine("highest is green");
             if (color.green() >= 80) {
                 telemetry.addLine("Pole detected");
@@ -344,7 +344,7 @@ public class Ftc_code1 extends OpMode {
                     stopThreadRunning = 1;
                     leftWheelF.setPower(0);
                     leftWheelR.setPower(0);
-        
+
                     rightWheelF.setPower(0);
                     rightWheelR.setPower(0);
 
